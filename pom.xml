@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+The MIT License
+
+Copyright (c) 2004-2011, Sun Microsystems, Inc., Olivier Lamy
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jenkins-ci</groupId>
+    <artifactId>jenkins</artifactId>
+    <version>1.17</version>
+  </parent>
+  
+  <groupId>org.jenkins-ci.main</groupId>
+  <artifactId>maven-modules</artifactId>
+  <version>1.403-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  
+  <name>Jenkins Maven Agents and Interceptors</name>
+  
+  <modules>
+    <module>maven-interceptor</module>
+    <module>maven-agent</module>
+    <module>maven3-interceptor</module>
+    <module>maven3-agent</module>
+  </modules>
+  
+  <scm>
+    <connection>scm:git:git://github.com/jenkinsci/jenkins.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/jenkins.git</developerConnection>
+    <url>https://github.com/jenkinsci/jenkins</url>
+  </scm>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+          <!-- enable release profile during the release, create IPS package, and sign bits. -->
+          <prepareVerifyArgs>-P release,sign</prepareVerifyArgs>
+          <goals>-DskipTests javadoc:javadoc animal-sniffer:check deploy javadoc:aggregate</goals>
+          <pushChanges>false</pushChanges>
+          <localCheckout>true</localCheckout>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-remote-resources-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>process</goal>
+            </goals>
+            <configuration>
+              <resourceBundles>
+                <resourceBundle>org.jvnet.hudson:license:1.0</resourceBundle>
+              </resourceBundles>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <!-- make sure our code doesn't have 1.6 dependencies except where we know it -->
+        <groupId>org.jvnet</groupId>
+        <artifactId>animal-sniffer</artifactId>
+        <version>1.2</version>
+        <configuration>
+          <signature>
+            <groupId>org.jvnet.animal-sniffer</groupId>
+            <artifactId>java1.5</artifactId>
+            <version>1.0</version>
+          </signature>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.1</version>
+        <configuration><!-- we specify this in the parent POM, so this is redundant, but otherwise IntelliJ is unhappy -->
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <!-- There is a bug in JDK 1.5's compiler therefore need to compile with 1.6 -->
+                <requireJavaVersion>
+                  <version>[1.6.0,]</version>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <!--
+          Since some developers try to run hudson-dev:run from main, define it here so that at least the plugin resolves.
+          This enables us to report a better error message.
+        -->
+        <groupId>org.jvnet.hudson.tools</groupId>
+        <artifactId>maven-hudson-dev-plugin</artifactId>
+        <version>6.1.7</version>
+      </plugin>
+
+      <!--<plugin>
+        <groupId>org.jvnet.fix1600</groupId>
+        <artifactId>fix1600</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>fix</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>-->
+    </plugins>
+
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-http</artifactId>
+        <version>1.0-beta-5</version>
+      </extension>
+    </extensions>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <!-- for JRE requirement check annotation -->
+      <groupId>org.jvnet</groupId>
+      <artifactId>animal-sniffer-annotation</artifactId>
+      <version>1.0</version>
+      <optional>true</optional><!-- no need to have this at runtime -->
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.hudson</groupId>
+      <artifactId>test-annotations</artifactId>
+      <version>1.0</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-core</artifactId>
+        <version>${mavenVersion}</version>
+      </dependency>    
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-compat</artifactId>
+        <version>${mavenVersion}</version>
+      </dependency>      
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-aether-provider</artifactId>
+        <version>${mavenVersion}</version>
+      </dependency>      
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-embedder</artifactId>
+        <version>${mavenVersion}</version>
+      </dependency>   
+      <dependency>
+        <groupId>org.sonatype.aether</groupId>
+        <artifactId>aether-api</artifactId>
+        <version>${aetherVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.aether</groupId>
+        <artifactId>aether-impl</artifactId>
+        <version>${aetherVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.aether</groupId>
+        <artifactId>aether-spi</artifactId>
+        <version>${aetherVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.aether</groupId>
+        <artifactId>aether-util</artifactId>
+        <version>${aetherVersion}</version>
+      </dependency>                                   
+      <dependency>
+        <groupId>org.sonatype.aether</groupId>
+        <artifactId>aether-connector-wagon</artifactId>
+        <version>${aetherVersion}</version>
+      </dependency>      
+      <dependency>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-http-lightweight</artifactId>
+        <version>${wagonVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-file</artifactId>
+        <version>${wagonVersion}</version>
+      </dependency>    
+  
+      <dependency>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-provider-api</artifactId>
+        <version>${wagonVersion}</version>
+      </dependency>      
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-inject-plexus</artifactId>
+        <version>${sisuInjectVersion}</version>
+      </dependency>  
+      
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-inject-bean</artifactId>
+        <version>${sisuInjectVersion}</version>
+      </dependency>      
+      
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-classworlds</artifactId>
+        <version>2.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.ant</groupId>
+        <artifactId>ant</artifactId>
+        <version>1.8.0</version>
+      </dependency>    
+      
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>1.4</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.8.1</version>
+      </dependency>  
+    </dependencies>
+  </dependencyManagement>
+
+  <properties>
+    <mavenVersion>3.0.3</mavenVersion>
+    <maven.version>${mavenVersion}</maven.version>
+    <aetherVersion>1.11</aetherVersion>
+    <sisuInjectVersion>1.4.3.1</sisuInjectVersion>
+    <wagonVersion>1.0-beta-7</wagonVersion>
+    <!-- *.html files are in UTF-8, and *.properties are in iso-8859-1, so this configuration is acturally incorrect,
+    but this suppresses a warning from Maven, and as long as we don't do filtering we should be OK. -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <profiles>
+    <profile>
+      <id>metrics</id>
+      <reporting>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>findbugs-maven-plugin</artifactId>
+            <version>2.4</version>
+            <configuration>
+              <threshold>High</threshold>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <version>2.5</version>
+            <configuration>
+              <!--rulesets>
+                  <ruleset>ruleset.xml</ruleset>
+                  </rulesets-->
+              <targetJdk>1.5</targetJdk>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>2.5</version>
+            <configuration>
+            </configuration>
+          </plugin>
+        </plugins>
+      </reporting>
+    </profile>
+    <profile>
+      <id>debug</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <hudson.sign.alias>jenkins</hudson.sign.alias>
+        <hudson.sign.keystore>../dummy.keystore</hudson.sign.keystore>
+        <hudson.sign.storepass>jenkins</hudson.sign.storepass>
+      </properties>
+    </profile>
+    <profile>
+      <id>sorcerer</id>
+      <reporting>
+        <plugins>
+          <plugin>
+            <groupId>org.jvnet.sorcerer</groupId>
+            <artifactId>maven-sorcerer-plugin</artifactId>
+            <version>0.8</version>
+          </plugin>
+        </plugins>
+      </reporting>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jvnet.sorcerer</groupId>
+            <artifactId>maven-sorcerer-plugin</artifactId>
+            <version>0.8</version>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <inherited>false</inherited>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>attached</goal>
+                </goals>
+                <phase>package</phase>
+                <configuration>
+                  <finalName>hudson-${project.version}</finalName>
+                  <descriptors>
+                    <descriptor>assembly-src.xml</descriptor>
+                  </descriptors>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>m2e</id>
+      <properties>
+        <m2BuildDirectory>target</m2BuildDirectory>
+      </properties>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <build>
+        <directory>${m2BuildDirectory}</directory>
+        <plugins>
+          <plugin>
+            <groupId>org.maven.ide.eclipse</groupId>
+            <artifactId>lifecycle-mapping</artifactId>
+            <version>0.12.0</version>
+            <configuration>
+              <mappingId>customizable</mappingId>
+              <configurators>
+                <configurator id="org.maven.ide.eclipse.jdt.javaConfigurator" />
+                <configurator id="org.maven.ide.eclipse.plexus.annotations.plexusConfigurator" />
+              </configurators>
+              <mojoExecutions>
+                <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
+              </mojoExecutions>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
+  <repositories>
+    <repository>
+      <id>m.g.o-public</id>
+      <url>http://maven.glassfish.org/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>m.g.o-public</id>
+      <url>http://maven.glassfish.org/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <licenses>
+    <license>
+      <name>The MIT license</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <distributionManagement>
+    <site>
+      <id>hudson-www</id>
+      <url>scp://jenkins-ci.org/home/kohsuke/www/hudson-labs.org/maven-site/</url>
+    </site>
+    <snapshotRepository>
+      <id>maven.jenkins-ci.org</id>
+      <url>http://maven.jenkins-ci.org:8081/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+</project>
