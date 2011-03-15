@@ -27,7 +27,7 @@ THE SOFTWARE.
   <parent>
     <groupId>org.jenkins-ci.main.maven</groupId>
     <artifactId>maven-modules</artifactId>
-    <version>1.403-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   
@@ -70,7 +70,7 @@ THE SOFTWARE.
 
   <dependencies>
     <dependency>
-      <groupId>org.jenkins-ci.main</groupId>
+      <groupId>org.jenkins-ci.main.maven</groupId>
       <artifactId>maven-interceptor</artifactId>
       <version>${project.version}</version>
       <exclusions>

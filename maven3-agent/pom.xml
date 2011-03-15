@@ -4,14 +4,14 @@
   <parent>
     <groupId>org.jenkins-ci.main.maven</groupId>
     <artifactId>maven-modules</artifactId>
-    <version>1.403-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
   </parent>
   <artifactId>maven3-agent</artifactId>
   <name>Jenkins Maven3 CLI Agent</name>
   
   <dependencies>
     <dependency>
-      <groupId>org.jenkins-ci.main</groupId>
+      <groupId>org.jenkins-ci.main.maven</groupId>
       <artifactId>maven3-interceptor</artifactId>
       <scope>provided</scope>
       <version>${project.version}</version>

@@ -32,7 +32,7 @@ THE SOFTWARE.
   
   <groupId>org.jenkins-ci.main.maven</groupId>
   <artifactId>maven-modules</artifactId>
-  <version>1.403-SNAPSHOT</version>
+  <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   
   <name>Jenkins Maven Agents and Interceptors</name>
@@ -49,6 +49,17 @@ THE SOFTWARE.
     <developerConnection>scm:git:ssh://git@github.com/jenkinsci/maven-interceptors.git</developerConnection>
     <url>https://github.com/jenkinsci/maven-interceptors</url>
   </scm>
+  
+  <properties>
+    <mavenVersion>3.0.3</mavenVersion>
+    <maven.version>${mavenVersion}</maven.version>
+    <aetherVersion>1.11</aetherVersion>
+    <sisuInjectVersion>1.4.3.1</sisuInjectVersion>
+    <wagonVersion>1.0-beta-7</wagonVersion>
+    <!-- *.html files are in UTF-8, and *.properties are in iso-8859-1, so this configuration is acturally incorrect,
+    but this suppresses a warning from Maven, and as long as we don't do filtering we should be OK. -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>  
 
   <build>
     <plugins>
@@ -56,9 +67,7 @@ THE SOFTWARE.
         <artifactId>maven-release-plugin</artifactId>
         <version>2.1</version>
         <configuration>
-          <!-- enable release profile during the release, create IPS package, and sign bits. -->
-          <prepareVerifyArgs>-P release,sign</prepareVerifyArgs>
-          <goals>-DskipTests javadoc:javadoc animal-sniffer:check deploy javadoc:aggregate</goals>
+          <goals>javadoc:javadoc animal-sniffer:check deploy javadoc:aggregate</goals>
           <pushChanges>false</pushChanges>
           <localCheckout>true</localCheckout>
         </configuration>
@@ -95,8 +104,8 @@ THE SOFTWARE.
 
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.1</version>
-        <configuration><!-- we specify this in the parent POM, so this is redundant, but otherwise IntelliJ is unhappy -->
+        <version>2.3.2</version>
+        <configuration>
           <source>1.5</source>
           <target>1.5</target>
         </configuration>
@@ -123,27 +132,6 @@ THE SOFTWARE.
         </executions>
       </plugin>
 
-      <plugin>
-        <!--
-          Since some developers try to run hudson-dev:run from main, define it here so that at least the plugin resolves.
-          This enables us to report a better error message.
-        -->
-        <groupId>org.jvnet.hudson.tools</groupId>
-        <artifactId>maven-hudson-dev-plugin</artifactId>
-        <version>6.1.7</version>
-      </plugin>
-
-      <!--<plugin>
-        <groupId>org.jvnet.fix1600</groupId>
-        <artifactId>fix1600</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>fix</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>-->
     </plugins>
 
     <extensions>
@@ -271,17 +259,6 @@ THE SOFTWARE.
     </dependencies>
   </dependencyManagement>
 
-  <properties>
-    <mavenVersion>3.0.3</mavenVersion>
-    <maven.version>${mavenVersion}</maven.version>
-    <aetherVersion>1.11</aetherVersion>
-    <sisuInjectVersion>1.4.3.1</sisuInjectVersion>
-    <wagonVersion>1.0-beta-7</wagonVersion>
-    <!-- *.html files are in UTF-8, and *.properties are in iso-8859-1, so this configuration is acturally incorrect,
-    but this suppresses a warning from Maven, and as long as we don't do filtering we should be OK. -->
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
   <profiles>
     <profile>
       <id>release</id>
@@ -338,7 +315,7 @@ THE SOFTWARE.
   <repositories>
     <repository>
       <id>m.g.o-public</id>
-      <url>http://maven.glassfish.org/content/groups/public/</url>
+      <url>http://maven.jenkins-ci.org:8081/content/groups/artifacts/</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -351,7 +328,7 @@ THE SOFTWARE.
   <pluginRepositories>
     <pluginRepository>
       <id>m.g.o-public</id>
-      <url>http://maven.glassfish.org/content/groups/public/</url>
+      <url>http://maven.jenkins-ci.org:8081/content/groups/artifacts/</url>
       <releases>
         <enabled>true</enabled>
       </releases>
