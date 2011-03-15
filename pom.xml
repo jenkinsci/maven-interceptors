@@ -45,9 +45,9 @@ THE SOFTWARE.
   </modules>
   
   <scm>
-    <connection>scm:git:git://github.com/jenkinsci/jenkins.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/jenkins.git</developerConnection>
-    <url>https://github.com/jenkinsci/jenkins</url>
+    <connection>scm:git:git://github.com/jenkinsci/maven-interceptors.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/maven-interceptors.git</developerConnection>
+    <url>https://github.com/jenkinsci/maven-interceptors</url>
   </scm>
 
   <build>
@@ -266,7 +266,7 @@ THE SOFTWARE.
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.8.1</version>
+        <version>4.8.2</version>
       </dependency>  
     </dependencies>
   </dependencyManagement>
