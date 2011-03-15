@@ -30,7 +30,7 @@ THE SOFTWARE.
     <version>1.17</version>
   </parent>
   
-  <groupId>org.jenkins-ci.main</groupId>
+  <groupId>org.jenkins-ci.main.maven</groupId>
   <artifactId>maven-modules</artifactId>
   <version>1.403-SNAPSHOT</version>
   <packaging>pom</packaging>
