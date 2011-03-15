@@ -288,24 +288,6 @@ THE SOFTWARE.
       <build>
         <plugins>
           <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <inherited>false</inherited>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>attached</goal>
-                </goals>
-                <phase>package</phase>
-                <configuration>
-                  <finalName>hudson-${project.version}</finalName>
-                  <descriptors>
-                    <descriptor>assembly-src.xml</descriptor>
-                  </descriptors>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
             <artifactId>maven-gpg-plugin</artifactId>
             <executions>
               <execution>
