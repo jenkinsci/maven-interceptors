@@ -22,8 +22,10 @@ package org.apache.maven.cli;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -86,6 +88,8 @@ public class DefaultMavenExecutionRequestBuilder
     private PlexusContainer plexusContainer;
 
     private DefaultSecDispatcher dispatcher;
+    
+    static final String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyyMMdd-HHmm";
 
     public void initialize()
         throws InitializationException
@@ -342,6 +346,7 @@ public class DefaultMavenExecutionRequestBuilder
         }
 
         systemProperties.putAll( System.getProperties() );
+        systemProperties.put( "maven.build.timestamp", new SimpleDateFormat(DEFAULT_BUILD_TIMESTAMP_FORMAT).format( new Date() ) );
     }
 
     private static void setCliProperty( String property, Properties properties )
