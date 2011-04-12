@@ -52,105 +52,102 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
  * @author Olivier Lamy
  */
 public class Maven3Main {
-	/**
-	 * Used to pass the classworld instance to the code running inside the
-	 * remoting system.
-	 */
-	private static Launcher launcher;
+    /**
+     * Used to pass the classworld instance to the code running inside the
+     * remoting system.
+     */
+    private static Launcher launcher;
 
-	public static void main(String[] args) throws Exception {
-		main(new File(args[0]), new File(args[1]),new File(args[2]),
-				Integer.parseInt(args[3]));		
-	}
+    public static void main(String[] args) throws Exception {
+        main(new File(args[0]), new File(args[1]),new File(args[2]),
+                Integer.parseInt(args[3]));
+    }
 
-	/**
-	 * 
-	 * @param m2Home
-	 *            Maven2 installation. This is where we find Maven jars that
-	 *            we'll run.
-	 * @param remotingJar
-	 *            Hudson's remoting.jar that we'll load.
-	 * @param interceptorJar
-	 *            maven-listener.jar that we'll load.
-	 * @param tcpPort
-	 *            TCP socket that the launching Hudson will be listening to.
-	 *            This is used for the remoting communication.
-	 * @param projectBuildLaunch
-	 *            launch the projectBuilder and not a mavenExecution            
-	 */
+    /**
+     *
+     * @param m2Home
+     *            Maven2 installation. This is where we find Maven jars that
+     *            we'll run.
+     * @param remotingJar
+     *            Hudson's remoting.jar that we'll load.
+     * @param interceptorJar
+     *            maven-listener.jar that we'll load.
+     * @param tcpPort
+     *            TCP socket that the launching Hudson will be listening to.
+     *            This is used for the remoting communication.
+     */
 	public static void main(File m2Home, File remotingJar, File interceptorJar,
 			int tcpPort) throws Exception {
-		// Unix master with Windows slave ends up passing path in Unix format,
-		// so convert it to Windows format now so that no one chokes with the
-		// path format later.
-		try {
-			m2Home = m2Home.getCanonicalFile();
-		} catch (IOException e) {
-			// ignore. We'll check the error later if m2Home exists anyway
-		}
+        // Unix master with Windows slave ends up passing path in Unix format,
+        // so convert it to Windows format now so that no one chokes with the
+        // path format later.
+        try {
+            m2Home = m2Home.getCanonicalFile();
+        } catch (IOException e) {
+            // ignore. We'll check the error later if m2Home exists anyway
+        }
 
-		if (!m2Home.exists()) {
-			System.err.println("No such directory exists: " + m2Home);
-			System.exit(1);
-		}
+        if (!m2Home.exists()) {
+            System.err.println("No such directory exists: " + m2Home);
+            System.exit(1);
+        }
 
-		versionCheck();
-			
-		// expose variables used in the classworlds configuration
-		System.setProperty("maven.home", m2Home.getPath());
-		System.setProperty("maven3.interceptor", (interceptorJar != null ? interceptorJar
-				: interceptorJar).getPath());
+        versionCheck();
 
-		// load the default realms
-		launcher = new Launcher();
-		launcher.setSystemClassLoader(Maven3Main.class.getClassLoader());
-		launcher.configure(getClassWorldsConfStream());
-		
+        // expose variables used in the classworlds configuration
+        System.setProperty("maven.home", m2Home.getPath());
+        System.setProperty("maven3.interceptor", (interceptorJar != null ? interceptorJar
+                : interceptorJar).getPath());
 
-		// create a realm for loading remoting subsystem.
-		// this needs to be able to see maven.
-		ClassRealm remoting = launcher.getWorld().newRealm( "hudson-remoting", launcher.getSystemClassLoader() );
-		remoting.setParentRealm(launcher.getWorld().getRealm("plexus.core"));
-		remoting.addURL(remotingJar.toURI().toURL());
-		
-		final Socket s = new Socket((String) null, tcpPort);
-		
-		Class remotingLauncher = remoting.loadClass("hudson.remoting.Launcher");
-		remotingLauncher.getMethod("main",
-				new Class[] { InputStream.class, OutputStream.class }).invoke(
-				null,
-				new Object[] {
-						// do partial close, since socket.getInputStream and
-						// getOutputStream doesn't do it by
-						new BufferedInputStream(new FilterInputStream(s
-								.getInputStream()) {
-							public void close() throws IOException {
-								s.shutdownInput();
-							}
-						}),
-						new BufferedOutputStream(new RealFilterOutputStream(s
-								.getOutputStream()) {
-							public void close() throws IOException {
-								s.shutdownOutput();
-							}
-						}) });
-		System.exit(0);
+        // load the default realms
+        launcher = new Launcher();
+        launcher.setSystemClassLoader(Maven3Main.class.getClassLoader());
+        launcher.configure(getClassWorldsConfStream());
+
+
+        // create a realm for loading remoting subsystem.
+        // this needs to be able to see maven.
+        ClassRealm remoting = launcher.getWorld().newRealm( "hudson-remoting", launcher.getSystemClassLoader() );
+        remoting.setParentRealm(launcher.getWorld().getRealm("plexus.core"));
+        remoting.addURL(remotingJar.toURI().toURL());
+
+        final Socket s = new Socket((String) null, tcpPort);
+
+        Class remotingLauncher = remoting.loadClass("hudson.remoting.Launcher");
+        remotingLauncher.getMethod("main",
+                new Class[] { InputStream.class, OutputStream.class }).invoke(
+                null,
+                new Object[] {
+                        // do partial close, since socket.getInputStream and
+                        // getOutputStream doesn't do it by
+                        new BufferedInputStream(new FilterInputStream(s
+                                .getInputStream()) {
+                            public void close() throws IOException {
+                                s.shutdownInput();
+                            }
+                        }),
+                        new BufferedOutputStream(new RealFilterOutputStream(s
+                                .getOutputStream()) {
+                            public void close() throws IOException {
+                                s.shutdownOutput();
+                            }
+                        }) });
+        System.exit(0);
 	}
 
-	/**
-	 * Called by the code in remoting to launch.
-	 */
-	public static int launch(String[] args) throws Exception {
-		
-		try {
-			launcher.launch(args);
-		} catch (Throwable e)
-		{
-		    e.printStackTrace();
-		    throw new Exception( e );
-		} 
-		return launcher.getExitCode();
-	}
+    /**
+     * Called by the code in remoting to launch.
+     */
+    public static int launch( String[] args ) throws Exception {
+
+        try {
+            launcher.launch( args );
+        } catch ( Throwable e ) {
+            e.printStackTrace();
+            throw new Exception( e );
+        }
+        return launcher.getExitCode();
+    }
 
     private static InputStream getClassWorldsConfStream() throws FileNotFoundException {
         String classWorldsConfLocation = System.getProperty("classworlds.conf");
