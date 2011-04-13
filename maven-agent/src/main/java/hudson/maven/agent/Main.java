@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
+import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -120,8 +121,16 @@ public class Main {
         
         remoting.setParent(launcher.getWorld().getRealm("plexus.core.maven"));
         remoting.addConstituent(remotingJar.toURI().toURL());
+	
+	final Socket s; 
+	String p = System.getProperty("maven.remote.useinet", "true");
 
-        final Socket s = new Socket((String)null,tcpPort);
+	if(p != null && p.equals("true")) {
+		InetAddress host = InetAddress.getLocalHost();
+		s = new Socket(host.getHostName(),tcpPort);
+	}
+	else 
+		s = new Socket((String)null,tcpPort);
 
         Class remotingLauncher = remoting.loadClass("hudson.remoting.Launcher");
         remotingLauncher.getMethod("main",new Class[]{InputStream.class,OutputStream.class}).invoke(null,
