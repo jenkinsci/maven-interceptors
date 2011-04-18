@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.InetAddress;
 
 import org.codehaus.plexus.classworlds.launcher.Launcher;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -111,7 +112,15 @@ public class Maven3Main {
         remoting.setParentRealm(launcher.getWorld().getRealm("plexus.core"));
         remoting.addURL(remotingJar.toURI().toURL());
 
-        final Socket s = new Socket((String) null, tcpPort);
+	final Socket s;  
+        String p = System.getProperty("maven.remote.useinet", "true");
+
+        if(p != null && p.equals("true")) {
+                InetAddress host = InetAddress.getLocalHost();
+                s = new Socket(host.getHostName(),tcpPort);
+        }
+        else 
+                s = new Socket((String)null,tcpPort);
 
         Class remotingLauncher = remoting.loadClass("hudson.remoting.Launcher");
         remotingLauncher.getMethod("main",
