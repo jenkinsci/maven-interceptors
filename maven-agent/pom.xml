@@ -27,7 +27,7 @@ THE SOFTWARE.
   <parent>
     <groupId>org.jenkins-ci.main.maven</groupId>
     <artifactId>maven-modules</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   
