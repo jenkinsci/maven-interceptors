@@ -112,15 +112,20 @@ public class Maven3Main {
         remoting.setParentRealm(launcher.getWorld().getRealm("plexus.core"));
         remoting.addURL(remotingJar.toURI().toURL());
 
-	final Socket s;  
-        String p = System.getProperty("maven.remote.useinet", "true");
+	    final Socket s;
 
-        if(p != null && p.equals("true")) {
-                InetAddress host = InetAddress.getLocalHost();
-                s = new Socket(host.getHostName(),tcpPort);
+        String mavenRemoteUseInetEnvVar = System.getenv( "MAVEN_REMOTE_USEINET" );
+
+        boolean mavenRemoteUseInet = Boolean.parseBoolean( mavenRemoteUseInetEnvVar );
+
+        if(mavenRemoteUseInet) {
+            InetAddress host = InetAddress.getLocalHost();
+            String hostname = host.getHostName();
+            System.out.println( "use inet address " + hostname );
+            s = new Socket(hostname,tcpPort);
         }
-        else 
-                s = new Socket((String)null,tcpPort);
+        else
+            s = new Socket((String)null,tcpPort);
 
         Class remotingLauncher = remoting.loadClass("hudson.remoting.Launcher");
         remotingLauncher.getMethod("main",

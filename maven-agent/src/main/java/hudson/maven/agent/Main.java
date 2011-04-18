@@ -123,11 +123,14 @@ public class Main {
         remoting.addConstituent(remotingJar.toURI().toURL());
 	
 	final Socket s; 
-	String p = System.getProperty("maven.remote.useinet", "true");
+    String mavenRemoteUseInetEnvVar = System.getenv( "MAVEN_REMOTE_USEINET" );
 
-	if(p != null && p.equals("true")) {
+    boolean mavenRemoteUseInet = Boolean.parseBoolean( mavenRemoteUseInetEnvVar );
+	if(mavenRemoteUseInet) {
 		InetAddress host = InetAddress.getLocalHost();
-		s = new Socket(host.getHostName(),tcpPort);
+        String hostname = host.getHostName();
+        System.out.println( "use inet address " + hostname );
+		s = new Socket(hostname,tcpPort);
 	}
 	else 
 		s = new Socket((String)null,tcpPort);
