@@ -92,10 +92,9 @@ THE SOFTWARE.
       <artifactId>ant</artifactId>
     </dependency>    
     <dependency>
-      <!-- default dependency to 2.0.2 confuses IntelliJ. Otherwise this value doesn't really affect build or runtime. -->
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
-      <version>3.1-rc1</version>
+      <version>3.1</version>
     </dependency>
     
     <!-- test dependencies -->
