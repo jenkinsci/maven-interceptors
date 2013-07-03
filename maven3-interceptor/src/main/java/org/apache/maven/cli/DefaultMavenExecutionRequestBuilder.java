@@ -89,8 +89,6 @@ public class DefaultMavenExecutionRequestBuilder
 
     private DefaultSecDispatcher dispatcher;
     
-    static final String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyyMMdd-HHmm";
-
     public void initialize()
         throws InitializationException
     {
@@ -128,18 +126,6 @@ public class DefaultMavenExecutionRequestBuilder
             encryption( cliRequest );
 
             MavenExecutionRequest request = executionRequestPopulator.populateDefaults( cliRequest.request );
-            
-            // TODO move this in ASF sources ?
-            
-            if (request.getProjectBuildingRequest().getRepositorySession()== null)
-            {
-                MavenRepositorySystemSession session = new MavenRepositorySystemSession();
-                if (session.getLocalRepositoryManager() == null)
-                {
-                    session.setLocalRepositoryManager( new EnhancedLocalRepositoryManager( request.getLocalRepositoryPath() ) );
-                }
-                request.getProjectBuildingRequest().setRepositorySession( session );
-            }
                         
             return request;
         }
@@ -346,7 +332,6 @@ public class DefaultMavenExecutionRequestBuilder
         }
 
         systemProperties.putAll( System.getProperties() );
-        systemProperties.put( "maven.build.timestamp", new SimpleDateFormat(DEFAULT_BUILD_TIMESTAMP_FORMAT).format( new Date() ) );
     }
 
     private static void setCliProperty( String property, Properties properties )
