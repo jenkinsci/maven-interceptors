@@ -99,13 +99,21 @@ THE SOFTWARE.
       </plugin>
       <plugin>
         <!-- make sure our code doesn't have 1.6 dependencies except where we know it -->
-        <groupId>org.jvnet</groupId>
-        <artifactId>animal-sniffer</artifactId>
-        <version>1.2</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>animal-sniffer-maven-plugin</artifactId>
+        <version>1.9</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
+          <!-- outside <execution> so that we can run 'animal-sniffer:check' from the top without breaking anything  -->
           <signature>
-            <groupId>org.jvnet.animal-sniffer</groupId>
-            <artifactId>java1.5</artifactId>
+            <groupId>org.codehaus.mojo.signature</groupId>
+            <artifactId>java15</artifactId>
             <version>1.0</version>
           </signature>
         </configuration>
@@ -149,9 +157,10 @@ THE SOFTWARE.
   <dependencies>
     <dependency>
       <!-- for JRE requirement check annotation -->
-      <groupId>org.jvnet</groupId>
-      <artifactId>animal-sniffer-annotation</artifactId>
-      <version>1.0</version>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>animal-sniffer-annotations</artifactId>
+      <version>1.9</version>
+      <scope>provided</scope>
       <optional>true</optional><!-- no need to have this at runtime -->
     </dependency>
     <dependency>
