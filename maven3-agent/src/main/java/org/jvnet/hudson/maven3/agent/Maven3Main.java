@@ -34,10 +34,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.InetAddress;
+import java.net.URL;
+import java.util.List;
 
 import org.codehaus.plexus.classworlds.launcher.Launcher;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 
 
 /**
@@ -148,6 +150,20 @@ public class Maven3Main {
                         }) });
         System.exit(0);
 	}
+
+    /**
+     * Called by the code in remoting to add more plexus components.
+     */
+    public static void addPlexusComponents(URL[] modules) {
+        try {
+            ClassRealm realm = launcher.getWorld().getRealm("plexus.core");
+            for (int i=0; i<modules.length; i++) {
+                realm.addURL(modules[i]);
+            }
+        } catch (NoSuchRealmException e) {
+            throw new Error(e);
+        }
+    }
 
     /**
      * Called by the code in remoting to launch.
