@@ -63,7 +63,7 @@ public class Maven3Main {
 
     public static void main(String[] args) throws Exception {
         main(new File(args[0]), new File(args[1]),new File(args[2]),
-                Integer.parseInt(args[3]));
+             new File(args[3]), Integer.parseInt(args[4]));
     }
 
     /**
@@ -79,8 +79,8 @@ public class Maven3Main {
      *            TCP socket that the launching Hudson will be listening to.
      *            This is used for the remoting communication.
      */
-	public static void main(File m2Home, File remotingJar, File interceptorJar,
-			int tcpPort) throws Exception {
+	public static void main(File m2Home, File remotingJar, File interceptorJar
+        , File interceptorCommonJar, int tcpPort) throws Exception {
         // Unix master with Windows slave ends up passing path in Unix format,
         // so convert it to Windows format now so that no one chokes with the
         // path format later.
@@ -99,6 +99,8 @@ public class Maven3Main {
 
         // expose variables used in the classworlds configuration
         System.setProperty("maven.home", m2Home.getPath());
+        System.setProperty("maven3.interceptor.common", (interceptorCommonJar != null ? interceptorCommonJar
+            : interceptorCommonJar).getPath());
         System.setProperty("maven3.interceptor", (interceptorJar != null ? interceptorJar
                 : interceptorJar).getPath());
 
