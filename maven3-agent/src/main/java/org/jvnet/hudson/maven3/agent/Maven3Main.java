@@ -75,6 +75,8 @@ public class Maven3Main {
      *            Hudson's remoting.jar that we'll load.
      * @param interceptorJar
      *            maven-listener.jar that we'll load.
+     * @param interceptorCommonJar
+     *            maven3-interceptor-commons.jar we'll load
      * @param tcpPort
      *            TCP socket that the launching Hudson will be listening to.
      *            This is used for the remoting communication.
