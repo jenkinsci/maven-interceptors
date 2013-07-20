@@ -40,6 +40,7 @@ THE SOFTWARE.
   <modules>
     <module>maven-interceptor</module>
     <module>maven-agent</module>
+    <module>maven3-interceptor-commons</module>
     <module>maven3-interceptor</module>
     <module>maven3-agent</module>
   </modules>
@@ -173,6 +174,11 @@ THE SOFTWARE.
   
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.jenkins-ci.main.maven</groupId>
+        <artifactId>maven3-interceptor-commons</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-core</artifactId>
