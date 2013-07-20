@@ -61,7 +61,7 @@ public class Maven3Main {
      */
     private static Launcher launcher;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String... args) throws Exception {
         main(new File(args[0]), new File(args[1]),new File(args[2]),
              new File(args[3]), Integer.parseInt(args[4]));
     }
