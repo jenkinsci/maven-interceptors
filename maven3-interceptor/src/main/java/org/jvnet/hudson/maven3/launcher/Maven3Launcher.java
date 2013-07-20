@@ -1,7 +1,7 @@
 package org.jvnet.hudson.maven3.launcher;
 
 /*
- * Olivier Lamy
+ * Copyright Olivier Lamy
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -35,7 +35,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.jvnet.hudson.maven3.listeners.HudsonMavenExecutionResult;
 
 /**
- * @author olamy
+ * @author Olivier Lamy
  *
  */
 public class Maven3Launcher {
