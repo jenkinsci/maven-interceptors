@@ -38,7 +38,7 @@ import org.jvnet.hudson.maven3.listeners.HudsonMavenExecutionResult;
  * @author Olivier Lamy
  *
  */
-public class Maven3Launcher {
+public class Maven31Launcher {
 
     private static HudsonMavenExecutionResult hudsonMavenExecutionResult;
 

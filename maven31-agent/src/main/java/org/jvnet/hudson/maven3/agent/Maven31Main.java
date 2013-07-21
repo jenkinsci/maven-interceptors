@@ -53,7 +53,7 @@ import java.net.URL;
  * @author Kohsuke Kawaguchi
  * @author Olivier Lamy
  */
-public class Maven3Main
+public class Maven31Main
 {
 
     /**
@@ -109,7 +109,7 @@ public class Maven3Main
 
         // load the default realms
         launcher = new Launcher();
-        launcher.setSystemClassLoader(Maven3Main.class.getClassLoader());
+        launcher.setSystemClassLoader(Maven31Main.class.getClassLoader());
         launcher.configure(getClassWorldsConfStream());
 
 
@@ -189,7 +189,7 @@ public class Maven3Main
         if (classWorldsConfLocation == null || classWorldsConfLocation.trim().length() == 0) {
             classWorldsConfLocation = System.getenv("classworlds.conf");
             if (classWorldsConfLocation == null || classWorldsConfLocation.trim().length() == 0) {
-                return Maven3Main.class.getResourceAsStream("classworlds.conf");
+                return Maven31Main.class.getResourceAsStream("classworlds.conf");
             }
         }
         return new FileInputStream(new File(classWorldsConfLocation));
