@@ -136,6 +136,11 @@ public class DefaultMavenExecutionRequestBuilder
         try
         {
             dispatcher = (DefaultSecDispatcher) plexusContainer.lookup( SecDispatcher.class, "maven" );
+            eventSpyDispatcher = plexusContainer.lookup( EventSpyDispatcher.class );
+            modelProcessor = plexusContainer.lookup( ModelProcessor.class );
+            executionRequestPopulator = plexusContainer.lookup( MavenExecutionRequestPopulator.class );
+            settingsBuilder = plexusContainer.lookup( SettingsBuilder.class );
+
         }
         catch ( ComponentLookupException e )
         {
