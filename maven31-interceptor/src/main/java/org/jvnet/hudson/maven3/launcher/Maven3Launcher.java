@@ -22,14 +22,14 @@ package org.jvnet.hudson.maven3.launcher;
 
 import org.apache.maven.Maven;
 import org.apache.maven.cli.MavenExecutionRequestBuilder;
-import org.apache.maven.cli.MavenLoggerManager;
-import org.apache.maven.cli.PrintStreamLogger;
+import org.apache.maven.cli.logging.Slf4jLoggerManager;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jvnet.hudson.maven3.listeners.HudsonMavenExecutionResult;
@@ -66,12 +66,13 @@ public class Maven3Launcher {
 
             ClassRealm containerRealm = (ClassRealm) Thread.currentThread().getContextClassLoader();
 
-            ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .setName( "maven" )
-                .setRealm( containerRealm );
+            ContainerConfiguration cc = new DefaultContainerConfiguration().setName( "maven" )
+                .setRealm( containerRealm )
+                .setClassPathScanning( PlexusConstants.SCANNING_INDEX ) // SCANNING_ON )//
+                .setAutoWiring( true );
 
             DefaultPlexusContainer container = new DefaultPlexusContainer( cc );
-            MavenLoggerManager mavenLoggerManager = new MavenLoggerManager( new PrintStreamLogger( System.out ) );
+            Slf4jLoggerManager mavenLoggerManager = new Slf4jLoggerManager( );
             container.setLoggerManager( mavenLoggerManager );
             
             Maven maven = (Maven) container.lookup( "org.apache.maven.Maven", "default" );

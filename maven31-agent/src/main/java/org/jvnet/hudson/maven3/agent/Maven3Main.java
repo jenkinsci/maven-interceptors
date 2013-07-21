@@ -53,7 +53,9 @@ import java.net.URL;
  * @author Kohsuke Kawaguchi
  * @author Olivier Lamy
  */
-public class Maven3Main {
+public class Maven3Main
+{
+
     /**
      * Used to pass the classworld instance to the code running inside the
      * remoting system.

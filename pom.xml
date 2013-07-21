@@ -43,6 +43,8 @@ THE SOFTWARE.
     <module>maven3-interceptor-commons</module>
     <module>maven3-interceptor</module>
     <module>maven3-agent</module>
+    <module>maven31-agent</module>
+    <module>maven31-interceptor</module>
   </modules>
   
   <scm>
@@ -53,6 +55,7 @@ THE SOFTWARE.
   
   <properties>
     <maven3.0.x.version>3.0.5</maven3.0.x.version>
+    <maven3.1.x.version>3.1.0</maven3.1.x.version>
     <aetherVersion>1.13</aetherVersion>
     <sisuInjectVersion>2.3.0</sisuInjectVersion>
     <wagonVersion>2.4</wagonVersion>
