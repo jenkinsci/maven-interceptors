@@ -27,7 +27,7 @@ THE SOFTWARE.
   <parent>
     <groupId>org.jenkins-ci</groupId>
     <artifactId>jenkins</artifactId>
-    <version>1.30</version>
+    <version>1.32</version>
   </parent>
   
   <groupId>org.jenkins-ci.main.maven</groupId>
@@ -317,9 +317,4 @@ THE SOFTWARE.
       <id>hudson-www</id>
       <url>scp://jenkins-ci.org/home/kohsuke/www/hudson-labs.org/maven-site/</url>
     </site>
-    <snapshotRepository>
-      <id>maven.jenkins-ci.org</id>
-      <url>http://maven.jenkins-ci.org:8081/content/repositories/snapshots</url>
-    </snapshotRepository>
-  </distributionManagement>
 </project>
