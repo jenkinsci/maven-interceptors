@@ -44,6 +44,19 @@ public class Maven3Launcher {
 
     private static ExecutionListener mavenExecutionListener;
 
+    /**
+    private static List<EventSpy> eventSpiesList;
+
+    public static List<EventSpy> getEventSpies()
+    {
+        return eventSpiesList;
+    }
+
+    public static void setEventSpies( List<EventSpy> theEventSpies )
+    {
+        eventSpiesList = theEventSpies;
+    }
+    **/
     public static ExecutionListener getMavenExecutionListener() {
         return mavenExecutionListener;
     }
@@ -75,6 +88,30 @@ public class Maven3Launcher {
             container.setLoggerManager( mavenLoggerManager );
             
             Maven maven = (Maven) container.lookup( "org.apache.maven.Maven", "default" );
+            /*
+            EventSpyDispatcher eventSpyDispatcher = container.lookup( EventSpyDispatcher.class );
+
+            if ( eventSpiesList != null && !eventSpiesList.isEmpty())
+            {
+                List<EventSpy> eventSpies = eventSpyDispatcher.getEventSpies();
+                if ( eventSpies == null )
+                {
+                    eventSpies = new ArrayList<EventSpy>( 1 );
+                }
+                eventSpies.addAll( eventSpiesList );
+
+                // get event spies added with plexus components
+                // see Maven31Maven addPlexusComponents
+                // PlexusModuleContributor extension
+                List<EventSpy> spies = container.lookupList( EventSpy.class );
+                if (spies != null && !spies.isEmpty())
+                {
+                    eventSpies.addAll( spies );
+                }
+
+                eventSpyDispatcher.setEventSpies( eventSpies );
+            }
+            */
             MavenExecutionRequest request = getMavenExecutionRequest( args, container );
 
             MavenExecutionResult result = maven.execute( request );

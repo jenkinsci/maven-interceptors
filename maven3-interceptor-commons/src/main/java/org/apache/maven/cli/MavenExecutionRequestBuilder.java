@@ -22,6 +22,7 @@ package org.apache.maven.cli;
 
 import java.io.PrintStream;
 
+import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.settings.building.SettingsBuildingException;
@@ -31,6 +32,6 @@ import org.apache.maven.settings.building.SettingsBuildingException;
  */
 public interface MavenExecutionRequestBuilder
 {
-    MavenExecutionRequest getMavenExecutionRequest( String[] args, PrintStream printStream )
+    MavenExecutionRequest getMavenExecutionRequest( String[] args, PrintStream printStream)
         throws MavenExecutionRequestPopulationException, SettingsBuildingException, MavenExecutionRequestsBuilderException;
 }

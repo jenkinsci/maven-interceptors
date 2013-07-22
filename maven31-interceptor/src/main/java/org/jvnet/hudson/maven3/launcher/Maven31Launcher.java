@@ -21,8 +21,12 @@ package org.jvnet.hudson.maven3.launcher;
  */
 
 import org.apache.maven.Maven;
+import org.apache.maven.cli.CLIReportingUtils;
 import org.apache.maven.cli.MavenExecutionRequestBuilder;
+import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
+import org.apache.maven.eventspy.EventSpy;
+import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
@@ -34,67 +38,120 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jvnet.hudson.maven3.listeners.HudsonMavenExecutionResult;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Olivier Lamy
- *
  */
-public class Maven31Launcher {
+public class Maven31Launcher
+{
 
     private static HudsonMavenExecutionResult hudsonMavenExecutionResult;
 
     private static ExecutionListener mavenExecutionListener;
 
-    public static ExecutionListener getMavenExecutionListener() {
+    private static List<EventSpy> eventSpiesList;
+
+    public static ExecutionListener getMavenExecutionListener()
+    {
         return mavenExecutionListener;
     }
 
-    public static void setMavenExecutionListener( ExecutionListener listener ) {
+    public static void setMavenExecutionListener( ExecutionListener listener )
+    {
         mavenExecutionListener = listener;
     }
 
-    public static HudsonMavenExecutionResult getMavenExecutionResult() {
+    public static List<EventSpy> getEventSpies()
+    {
+        return eventSpiesList;
+    }
+
+    public static void setEventSpies( List<EventSpy> theEventSpies )
+    {
+        eventSpiesList = theEventSpies;
+    }
+
+    public static HudsonMavenExecutionResult getMavenExecutionResult()
+    {
         return hudsonMavenExecutionResult;
     }
 
-    public static void setMavenExecutionResult( HudsonMavenExecutionResult result ) {
+    public static void setMavenExecutionResult( HudsonMavenExecutionResult result )
+    {
         hudsonMavenExecutionResult = result;
     }
 
-    public static int main( String[] args ) throws Exception {
+    public static int main( String[] args )
+        throws Exception
+    {
         ClassLoader orig = Thread.currentThread().getContextClassLoader();
-        try {
+        try
+        {
 
             ClassRealm containerRealm = (ClassRealm) Thread.currentThread().getContextClassLoader();
 
-            ContainerConfiguration cc = new DefaultContainerConfiguration().setName( "maven" )
-                .setRealm( containerRealm )
-                .setClassPathScanning( PlexusConstants.SCANNING_INDEX ) // SCANNING_ON )//
-                .setAutoWiring( true );
+            ContainerConfiguration cc =
+                new DefaultContainerConfiguration().setName( "maven" ).setRealm( containerRealm ).setClassPathScanning(
+                    PlexusConstants.SCANNING_INDEX ).setAutoWiring( true );
 
             DefaultPlexusContainer container = new DefaultPlexusContainer( cc );
-            Slf4jLoggerManager mavenLoggerManager = new Slf4jLoggerManager( );
+            Slf4jLoggerManager mavenLoggerManager = new Slf4jLoggerManager();
             container.setLoggerManager( mavenLoggerManager );
-            
+
             Maven maven = (Maven) container.lookup( "org.apache.maven.Maven", "default" );
+
+            EventSpyDispatcher eventSpyDispatcher = container.lookup( EventSpyDispatcher.class );
+
+            if ( eventSpiesList != null && !eventSpiesList.isEmpty())
+            {
+                List<EventSpy> eventSpies = eventSpyDispatcher.getEventSpies();
+                if ( eventSpies == null )
+                {
+                    eventSpies = new ArrayList<EventSpy>( 1 );
+                }
+                eventSpies.addAll( eventSpiesList );
+
+                // get event spies added with plexus components
+                // see Maven31Maven addPlexusComponents
+                // PlexusModuleContributor extension
+                List<EventSpy> spies = container.lookupList( EventSpy.class );
+                if (spies != null && !spies.isEmpty())
+                {
+                    eventSpies.addAll( spies );
+                }
+
+                eventSpyDispatcher.setEventSpies( eventSpies );
+            }
+
             MavenExecutionRequest request = getMavenExecutionRequest( args, container );
 
             MavenExecutionResult result = maven.execute( request );
             hudsonMavenExecutionResult = new HudsonMavenExecutionResult( result );
-            
+
             // we don't care about cli mavenExecutionResult will be study in the the plugin
             return 0;// cli.doMain( args, null );
-        } catch ( ComponentLookupException e ) {
+        }
+        catch ( ComponentLookupException e )
+        {
             throw new Exception( e.getMessage(), e );
-        } finally {
+        }
+        finally
+        {
             Thread.currentThread().setContextClassLoader( orig );
         }
     }
 
-    private static MavenExecutionRequest getMavenExecutionRequest( String[] args, DefaultPlexusContainer container ) throws Exception {
-        MavenExecutionRequestBuilder mavenExecutionRequestBuilder = container
-            .lookup( MavenExecutionRequestBuilder.class );
+    private static MavenExecutionRequest getMavenExecutionRequest( String[] args, DefaultPlexusContainer container )
+        throws Exception
+    {
+        MavenExecutionRequestBuilder mavenExecutionRequestBuilder =
+            container.lookup( MavenExecutionRequestBuilder.class );
         MavenExecutionRequest request = mavenExecutionRequestBuilder.getMavenExecutionRequest( args, System.out );
-        if ( mavenExecutionListener != null ) {
+        if ( mavenExecutionListener != null )
+        {
             request.setExecutionListener( mavenExecutionListener );
         }
         return request;

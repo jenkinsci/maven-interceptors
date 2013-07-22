@@ -34,6 +34,7 @@ import org.apache.maven.cli.logging.Slf4jStdoutLogger;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
+import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -151,7 +152,7 @@ public class DefaultMavenExecutionRequestBuilder
     /**
      * @throws MavenExecutionRequestPopulationException 
      */
-    public MavenExecutionRequest getMavenExecutionRequest( String[] args, PrintStream printStream )
+    public MavenExecutionRequest getMavenExecutionRequest( String[] args, PrintStream printStream)
         throws MavenExecutionRequestPopulationException, SettingsBuildingException,
         MavenExecutionRequestsBuilderException
     {
@@ -172,6 +173,15 @@ public class DefaultMavenExecutionRequestBuilder
             repository( cliRequest );
 
             MavenExecutionRequest request = executionRequestPopulator.populateDefaults( cliRequest.request );
+
+            DefaultEventSpyContext eventSpyContext = new DefaultEventSpyContext();
+            Map<String, Object> data = eventSpyContext.getData();
+            data.put( "plexus", plexusContainer );
+            data.put( "workingDirectory",  cliRequest.workingDirectory );
+            data.put( "systemProperties", cliRequest.systemProperties );
+            data.put( "userProperties", cliRequest.userProperties );
+            data.put( "versionProperties", CLIReportingUtils.getBuildProperties() );
+            eventSpyDispatcher.init( eventSpyContext );
 
 
             return request;
