@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jvnet.hudson.maven3.agent;
+package jenkins.maven3.utils;
 
 import java.io.OutputStream;
 import java.io.IOException;
@@ -32,7 +32,7 @@ import java.io.FilterOutputStream;
  *
  * @author Kohsuke Kawaguchi
  */
-class RealFilterOutputStream extends FilterOutputStream {
+public class RealFilterOutputStream extends FilterOutputStream {
     public RealFilterOutputStream(OutputStream core) {
         super(core);
     }

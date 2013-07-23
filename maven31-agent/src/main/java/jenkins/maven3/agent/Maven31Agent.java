@@ -1,4 +1,4 @@
-package org.jvnet.hudson.maven3.agent;
+package jenkins.maven3.agent;
 
 /*
  * Copyright Olivier Lamy
@@ -21,9 +21,11 @@ package org.jvnet.hudson.maven3.agent;
  */
 
 /**
+ * Marker for MavenComputerListener to get the jar
  * @author Olivier Lamy
+ * @since 1.4
  */
 public interface Maven31Agent
 {
-    // Marker for MavenComputerListener to get the jar
+    // no op
 }

@@ -21,8 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jvnet.hudson.maven3.agent;
+package jenkins.maven3.agent;
 
+import jenkins.maven3.utils.RealFilterOutputStream;
 import org.codehaus.plexus.classworlds.launcher.Launcher;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
@@ -52,6 +53,7 @@ import java.net.URL;
  * 
  * @author Kohsuke Kawaguchi
  * @author Olivier Lamy
+ * @since 1.4
  */
 public class Maven31Main
 {
