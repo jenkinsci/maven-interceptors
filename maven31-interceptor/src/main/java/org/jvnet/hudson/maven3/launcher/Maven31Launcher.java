@@ -44,6 +44,7 @@ import java.util.Map;
 
 /**
  * @author Olivier Lamy
+ * @since 1.4
  */
 public class Maven31Launcher
 {

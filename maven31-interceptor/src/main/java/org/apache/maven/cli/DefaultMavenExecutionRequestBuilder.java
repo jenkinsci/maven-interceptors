@@ -96,6 +96,7 @@ import java.util.StringTokenizer;
 /**
  * Most of code is coming from asf svn repo waiting before having available
  * @author Olivier Lamy
+ * @since 1.4
  */
 @Component( role = MavenExecutionRequestBuilder.class)
 public class DefaultMavenExecutionRequestBuilder

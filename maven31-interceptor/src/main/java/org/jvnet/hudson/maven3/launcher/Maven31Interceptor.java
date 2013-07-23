@@ -22,6 +22,7 @@ package org.jvnet.hudson.maven3.launcher;
 
 /**
  * @author Olivier Lamy
+ * @since 1.4
  */
 public interface Maven31Interceptor
 {
