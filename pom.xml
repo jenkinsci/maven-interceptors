@@ -317,4 +317,5 @@ THE SOFTWARE.
       <id>hudson-www</id>
       <url>scp://jenkins-ci.org/home/kohsuke/www/hudson-labs.org/maven-site/</url>
     </site>
+  </distributionManagement>
 </project>
