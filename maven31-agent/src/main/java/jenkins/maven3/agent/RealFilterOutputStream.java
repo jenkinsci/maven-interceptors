@@ -21,19 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package jenkins.maven3.utils;
+package jenkins.maven3.agent;
 
-import java.io.OutputStream;
-import java.io.IOException;
 import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
- * JDK's {@link FilterOutputStream} has some real issues. 
+ * JDK's {@link java.io.FilterOutputStream} has some real issues.
  *
  * @author Kohsuke Kawaguchi
  */
-public class RealFilterOutputStream extends FilterOutputStream {
-    public RealFilterOutputStream(OutputStream core) {
+class RealFilterOutputStream
+    extends FilterOutputStream {
+    public RealFilterOutputStream( OutputStream core ) {
         super(core);
     }
 

@@ -23,7 +23,6 @@
  */
 package org.jvnet.hudson.maven3.agent;
 
-import jenkins.maven3.utils.RealFilterOutputStream;
 import org.codehaus.plexus.classworlds.launcher.Launcher;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
