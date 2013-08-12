@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jvnet.hudson.maven3.agent;
+package jenkins.maven3.agent;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;

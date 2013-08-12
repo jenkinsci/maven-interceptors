@@ -1,6 +1,7 @@
-package org.apache.maven.cli;
+package jenkins.maven3.agent;
 
 /*
+ * Copyright Olivier Lamy
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -19,18 +20,12 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import java.io.PrintStream;
-
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequestPopulationException;
-import org.apache.maven.settings.building.SettingsBuildingException;
-
 /**
+ * Marker for MavenComputerListener to get the jar
  * @author Olivier Lamy
- * @since 
+ * @since 1.4
  */
-public interface MavenExecutionRequestBuilder
+public interface Maven31Agent
 {
-    MavenExecutionRequest getMavenExecutionRequest( String[] args, PrintStream printStream )
-        throws MavenExecutionRequestPopulationException, SettingsBuildingException, MavenExecutionRequestsBuilderException;
+    // no op
 }

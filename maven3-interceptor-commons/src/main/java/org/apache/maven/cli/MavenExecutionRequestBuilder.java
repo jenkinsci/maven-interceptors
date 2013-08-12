@@ -1,6 +1,7 @@
 package org.apache.maven.cli;
 
 /*
+ * Copyright Olivier Lamy
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -19,15 +20,18 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import java.io.PrintStream;
+
+import org.apache.maven.eventspy.EventSpy;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequestPopulationException;
+import org.apache.maven.settings.building.SettingsBuildingException;
+
 /**
  * @author Olivier Lamy
- * @since 
  */
-public class MavenExecutionRequestsBuilderException
-    extends Exception
+public interface MavenExecutionRequestBuilder
 {
-    public MavenExecutionRequestsBuilderException(String message, Throwable exception)
-    {
-        super( message, exception );
-    }
+    MavenExecutionRequest getMavenExecutionRequest( String[] args, PrintStream printStream)
+        throws MavenExecutionRequestPopulationException, SettingsBuildingException, MavenExecutionRequestsBuilderException;
 }

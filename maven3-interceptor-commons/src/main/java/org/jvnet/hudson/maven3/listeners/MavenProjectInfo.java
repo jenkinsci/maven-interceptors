@@ -1,7 +1,7 @@
 package org.jvnet.hudson.maven3.listeners;
 
 /*
- * Olivier Lamy
+ * Copyright Olivier Lamy
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -26,7 +26,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * @author Olivier Lamy
- * @since 
+ *
  */
 public class MavenProjectInfo implements Serializable
 {

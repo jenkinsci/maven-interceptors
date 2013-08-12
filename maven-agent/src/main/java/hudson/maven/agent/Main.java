@@ -31,8 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.net.InetAddress;
 import java.net.Socket;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,29 +59,14 @@ public class Main {
      * Used to pass the classworld instance to the code running inside the remoting system.
      */
     private static Launcher launcher;
-    
     /**
-    * Version >= 2.0.6?
-    */
-   private static boolean is206OrLater;
-    
+     * Version >= 2.0.6?
+     */
+    private static boolean is206OrLater;
+
     public static void main(String[] args) throws Exception {
         main(new File(args[0]),new File(args[1]),new File(args[2]),Integer.parseInt(args[3]),
                 args.length==4?null:new File(args[4]));
-    }
-    /**
-     * Called by the code in remoting to add more plexus components.
-     */
-    public static void addPlexusComponents(URL[] modules) {
-    	
-        try {
-            ClassRealm realm = launcher.getWorld().getRealm(is206OrLater?"plexus.core.maven":"plexus.core");
-            for (int i=0; i<modules.length; i++) {
-                realm.addConstituent(modules[i]);
-            }
-        } catch (NoSuchRealmException e) {
-            throw new Error(e);
-        }
     }
 
     /**
@@ -127,7 +112,7 @@ public class Main {
         launcher = new Launcher();
         launcher.setSystemClassLoader(Main.class.getClassLoader());
         launcher.configure(Main.class.getResourceAsStream(
-            is206OrLater?"classworlds-2.0.6.conf":"classworlds.conf"));
+            is206OrLater ?"classworlds-2.0.6.conf":"classworlds.conf"));
 
         // have it eventually delegate to this class so that this can be visible
 
@@ -192,8 +177,22 @@ public class Main {
     }
 
     /**
+     * Called by the code in remoting to add more plexus components.
+     * @since 1.3
+     */
+    public static void addPlexusComponents(URL[] modules) {
+        try {
+            ClassRealm realm = launcher.getWorld().getRealm(is206OrLater?"plexus.core.maven":"plexus.core");
+            for (int i=0; i<modules.length; i++) {
+                realm.addConstituent(modules[i]);
+            }
+        } catch (NoSuchRealmException e) {
+            throw new Error(e);
+        }
+    }
+
+    /**
      * Called by the code in remoting to launch.
-     * @throws org.codehaus.plexus.classworlds.realm.NoSuchRealmException 
      */
     public static int launch(String[] args) throws NoSuchMethodException, IllegalAccessException, NoSuchRealmException, InvocationTargetException, ClassNotFoundException {
         //ClassWorld world = ClassWorldAdapter.getInstance( launcher.getWorld() );
