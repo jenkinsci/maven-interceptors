@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jvnet.hudson.maven3.agent;
+package jenkins.maven3.agent;
 
 import org.codehaus.plexus.classworlds.launcher.Launcher;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -52,8 +52,11 @@ import java.net.URL;
  * 
  * @author Kohsuke Kawaguchi
  * @author Olivier Lamy
+ * @since 1.4
  */
-public class Maven3Main {
+public class Maven31Main
+{
+
     /**
      * Used to pass the classworld instance to the code running inside the
      * remoting system.
@@ -107,7 +110,7 @@ public class Maven3Main {
 
         // load the default realms
         launcher = new Launcher();
-        launcher.setSystemClassLoader(Maven3Main.class.getClassLoader());
+        launcher.setSystemClassLoader(Maven31Main.class.getClassLoader());
         launcher.configure(getClassWorldsConfStream());
 
 
@@ -188,7 +191,7 @@ public class Maven3Main {
         if (classWorldsConfLocation == null || classWorldsConfLocation.trim().length() == 0) {
             classWorldsConfLocation = System.getenv("classworlds.conf");
             if (classWorldsConfLocation == null || classWorldsConfLocation.trim().length() == 0) {
-                return Maven3Main.class.getResourceAsStream("classworlds.conf");
+                return Maven31Main.class.getResourceAsStream("classworlds.conf");
             }
         }
         return new FileInputStream(new File(classWorldsConfLocation));

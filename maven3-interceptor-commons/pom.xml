@@ -6,14 +6,10 @@
     <artifactId>maven-modules</artifactId>
     <version>1.5-SNAPSHOT</version>
   </parent>
-  <artifactId>maven3-interceptor</artifactId>
-  <name>Jenkins Maven3 Interceptor</name>
+  <artifactId>maven3-interceptor-commons</artifactId>
+  <name>Jenkins Maven3 Interceptor Commons</name>
 
   <dependencies>
-    <dependency>
-      <groupId>org.jenkins-ci.main.maven</groupId>
-      <artifactId>maven3-interceptor-commons</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
@@ -29,12 +25,7 @@
       <artifactId>maven-aether-provider</artifactId>
       <version>${maven3.0.x.version}</version>
     </dependency>          
-    
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
-    </dependency>     
-    
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

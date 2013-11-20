@@ -178,6 +178,8 @@ public class Main {
 
     /**
      * Called by the code in remoting to add more plexus components.
+     *
+     * @since 1.3
      */
     public static void addPlexusComponents(URL[] modules) {
         try {
