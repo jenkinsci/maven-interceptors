@@ -117,20 +117,7 @@ public class Maven3Main {
         remoting.setParentRealm(launcher.getWorld().getRealm("plexus.core"));
         remoting.addURL(remotingJar.toURI().toURL());
 
-	    final Socket s;
-
-        String mavenRemoteUseInetEnvVar = System.getenv( "MAVEN_REMOTE_USEINET" );
-
-        boolean mavenRemoteUseInet = Boolean.parseBoolean( mavenRemoteUseInetEnvVar );
-
-        if(mavenRemoteUseInet) {
-            InetAddress host = InetAddress.getLocalHost();
-            String hostname = host.getHostName();
-            System.out.println( "use inet address " + hostname );
-            s = new Socket(hostname,tcpPort);
-        }
-        else
-            s = new Socket((String)null,tcpPort);
+        final Socket s = new Socket(getAgentHostname(),tcpPort);
 
         Class remotingLauncher = remoting.loadClass("hudson.remoting.Launcher");
         remotingLauncher.getMethod("main",
@@ -153,6 +140,31 @@ public class Maven3Main {
                         }) });
         System.exit(0);
 	}
+
+    private static String getAgentHostname() throws IOException {
+        String mavenRemoteUseInetEnvVar = System.getenv( "MAVEN_REMOTE_USEINET" );
+        boolean mavenRemoteUseInet = Boolean.parseBoolean( mavenRemoteUseInetEnvVar );
+
+        if(mavenRemoteUseInet) {
+            InetAddress host = InetAddress.getLocalHost();
+            String hostname = host.getHostName();
+            System.out.println( "use inet address " + hostname );
+            return hostname;
+        }
+
+        String mavenAgentAddress = System.getenv( "MAVEN_REMOTE_ADDRESS" );
+
+        if(mavenAgentAddress != null) {
+            mavenAgentAddress = mavenAgentAddress.trim();
+
+            if(mavenAgentAddress.length() > 0) {
+                System.out.println( "use agent address " + mavenAgentAddress );
+                return mavenAgentAddress;
+            }
+        }
+
+        return null;
+    }
 
     /**
      * Called by the code in remoting to add more plexus components.
