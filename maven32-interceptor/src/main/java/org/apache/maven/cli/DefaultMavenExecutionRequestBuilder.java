@@ -984,7 +984,10 @@ public class DefaultMavenExecutionRequestBuilder
         	if (threadConfiguration.contains("C")) {
         		threadCount *= Runtime.getRuntime().availableProcessors();
         	}
-        	request.setDegreeOfConcurrency(threadCount);
+        	if (threadCount > 1) {
+        		request.setDegreeOfConcurrency(threadCount);
+        		request.setBuilderId("multithreaded");
+        	}
         }
 
         request.setCacheNotFound( true );
