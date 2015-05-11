@@ -20,12 +20,10 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import com.google.inject.AbstractModule;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.InternalErrorException;
-import org.apache.maven.Maven;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cli.logging.Slf4jConfiguration;
@@ -35,20 +33,14 @@ import org.apache.maven.cli.logging.Slf4jStdoutLogger;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
-import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
-import org.apache.maven.exception.DefaultExceptionHandler;
-import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
-import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.building.ModelProcessor;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
@@ -57,10 +49,6 @@ import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.building.SettingsSource;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -86,8 +74,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -932,12 +918,20 @@ public class DefaultMavenExecutionRequestBuilder
         {
             String[] values = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
             List<String> projects = new ArrayList<String>();
+            List<String> excludedProjects = new ArrayList<String>();
             for ( String value : values )
             {
                 String[] tmp = StringUtils.split( value, "," );
-                projects.addAll( Arrays.asList( tmp ) );
+                for(String project: tmp){
+                    if(project.startsWith("!")){
+                        excludedProjects.add(project.substring(1));
+                    } else {
+                        projects.add(project);
+                    }
+                }
             }
             request.setSelectedProjects( projects );
+            request.setExcludedProjects(excludedProjects);
         }
 
         if ( commandLine.hasOption( CLIManager.ALSO_MAKE )
