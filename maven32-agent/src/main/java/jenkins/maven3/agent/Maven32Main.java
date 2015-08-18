@@ -39,6 +39,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 
 /**
@@ -64,9 +65,24 @@ public class Maven32Main
     private static Launcher launcher;
 
     public static void main(String... args) throws Exception {
-        main(new File(args[0]), new File(args[1]),new File(args[2]),
-             new File(args[3]), Integer.parseInt(args[4]));
+        String slaveAgentSocket = args[4];
+        int i = slaveAgentSocket.indexOf(':');
+        if (i > 0) {
+            main(new File(args[0]), new File(args[1]), new File(args[2]),
+                    new File(args[3]), slaveAgentSocket.substring(0, i), Integer.parseInt(slaveAgentSocket.substring(i+1)));
+        } else {
+            main(new File(args[0]), new File(args[1]), new File(args[2]),
+                    new File(args[3]), null, Integer.parseInt(slaveAgentSocket));
+        }
     }
+
+    @Deprecated
+    public static void main(File m2Home, File remotingJar, File interceptorJar
+            , File interceptorCommonJar, int tcpPort) throws Exception {
+
+        main(m2Home, remotingJar, interceptorJar, interceptorCommonJar, null, tcpPort);
+    }
+
 
     /**
      *
@@ -79,12 +95,14 @@ public class Maven32Main
      *            maven-listener.jar that we'll load.
      * @param interceptorCommonJar
      *            maven3-interceptor-commons.jar we'll load
+     * @param agentIp
+     *            IP address the TCP socket is bound to
      * @param tcpPort
      *            TCP socket that the launching Hudson will be listening to.
      *            This is used for the remoting communication.
      */
-	public static void main(File m2Home, File remotingJar, File interceptorJar
-        , File interceptorCommonJar, int tcpPort) throws Exception {
+	public static void main(File m2Home, File remotingJar, File interceptorJar,
+                            File interceptorCommonJar, String agentIp, int tcpPort) throws Exception {
         // Unix master with Windows slave ends up passing path in Unix format,
         // so convert it to Windows format now so that no one chokes with the
         // path format later.
@@ -120,20 +138,7 @@ public class Maven32Main
         remoting.setParentRealm(launcher.getWorld().getRealm("plexus.core"));
         remoting.addURL(remotingJar.toURI().toURL());
 
-	    final Socket s;
-
-        String mavenRemoteUseInetEnvVar = System.getenv( "MAVEN_REMOTE_USEINET" );
-
-        boolean mavenRemoteUseInet = Boolean.parseBoolean( mavenRemoteUseInetEnvVar );
-
-        if(mavenRemoteUseInet) {
-            InetAddress host = InetAddress.getLocalHost();
-            String hostname = host.getHostName();
-            System.out.println( "use inet address " + hostname );
-            s = new Socket(hostname,tcpPort);
-        }
-        else
-            s = new Socket((String)null,tcpPort);
+        final Socket s = new Socket(agentIp,tcpPort);
 
         Class remotingLauncher = remoting.loadClass("hudson.remoting.Launcher");
         remotingLauncher.getMethod("main",
