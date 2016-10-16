@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci.main.maven</groupId>
     <artifactId>maven-modules</artifactId>
-    <version>1.8</version>
+    <version>1.9-SNAPSHOT</version>
   </parent>
   <artifactId>maven3-interceptor-commons</artifactId>
   <name>Jenkins Maven3 Interceptor Commons</name>
