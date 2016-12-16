@@ -26,6 +26,7 @@ package jenkins.maven3.agent;
 import org.codehaus.plexus.classworlds.launcher.Launcher;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.launcher.ConfigurationException;
 
 import java.io.BufferedInputStream;
@@ -84,7 +85,7 @@ public class Maven32Main
         main(m2Home, remotingJar, interceptorJar, interceptorCommonJar, null, tcpPort);
     }
 
-    private static void initializeLauncher() throws IOException, ConfigurationException {
+    private static void initializeLauncher() throws IOException, ConfigurationException, DuplicateRealmException {
         // load the default realms
         launcher = new Launcher();
         launcher.setSystemClassLoader(Maven32Main.class.getClassLoader());
