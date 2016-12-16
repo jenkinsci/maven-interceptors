@@ -83,7 +83,7 @@ public class Maven32Main
         main(m2Home, remotingJar, interceptorJar, interceptorCommonJar, null, tcpPort);
     }
 
-    private static void initializeLauncher() {
+    private static void initializeLauncher() throws IOException {
         // load the default realms
         launcher = new Launcher();
         launcher.setSystemClassLoader(Maven32Main.class.getClassLoader());
