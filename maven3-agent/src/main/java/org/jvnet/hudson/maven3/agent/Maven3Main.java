@@ -131,7 +131,7 @@ public class Maven3Main {
         System.setProperty("maven3.interceptor", (interceptorJar != null ? interceptorJar
                 : interceptorJar).getPath());
         
-        initializeLauncher()
+        initializeLauncher();
 
         // create a realm for loading remoting subsystem.
         // this needs to be able to see maven.
