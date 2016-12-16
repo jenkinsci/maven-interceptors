@@ -202,7 +202,9 @@ public class Main {
     /**
      * Called by the code in remoting to launch.
      */
-    public static int launch(String[] args) throws NoSuchMethodException, IllegalAccessException, NoSuchRealmException, InvocationTargetException, ClassNotFoundException {
+    public static int launch(String[] args)
+        throws NoSuchMethodException, IllegalAccessException, NoSuchRealmException, DuplicateRealmException,
+                IOException, InvocationTargetException, ClassNotFoundException, ConfigurationException {
         //ClassWorld world = ClassWorldAdapter.getInstance( launcher.getWorld() );
         if (launcher == null) {
             initializeLauncher();
