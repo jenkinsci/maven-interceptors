@@ -43,8 +43,8 @@ import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.DefaultClassRealm;
 import org.codehaus.classworlds.Launcher;
 import org.codehaus.classworlds.NoSuchRealmException;
-import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
-import org.codehaus.plexus.classworlds.launcher.ConfigurationException;
+import org.codehaus.classworlds.DuplicateRealmException;
+import org.codehaus.classworlds.ConfigurationException;
 
 /**
  * Entry point for launching Maven and Hudson remoting in the same VM,
