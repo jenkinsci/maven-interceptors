@@ -79,7 +79,7 @@ public class Maven33Main
 	    throws IOException, ConfigurationException, DuplicateRealmException, NoSuchRealmException {
         // load the default realms
         launcher = new Launcher();
-        launcher.setSystemClassLoader(Maven32Main.class.getClassLoader());
+        launcher.setSystemClassLoader(Maven33Main.class.getClassLoader());
         launcher.configure(getClassWorldsConfStream());
     }
 
