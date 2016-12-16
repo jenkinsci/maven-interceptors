@@ -26,6 +26,8 @@ package jenkins.maven3.agent;
 import org.codehaus.plexus.classworlds.launcher.Launcher;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
+import org.codehaus.plexus.classworlds.launcher.ConfigurationException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -82,7 +84,14 @@ public class Maven31Main
         main(m2Home, remotingJar, interceptorJar, interceptorCommonJar, null, tcpPort);
     }
 
-
+    private static void initializeLauncher()
+	    throws IOException, ConfigurationException, DuplicateRealmException, NoSuchRealmException {
+        // load the default realms
+        launcher = new Launcher();
+        launcher.setSystemClassLoader(Maven32Main.class.getClassLoader());
+        launcher.configure(getClassWorldsConfStream());
+    }
+    
     /**
      *
      * @param m2Home
@@ -125,11 +134,7 @@ public class Maven31Main
         System.setProperty("maven3.interceptor", (interceptorJar != null ? interceptorJar
                 : interceptorJar).getPath());
 
-        // load the default realms
-        launcher = new Launcher();
-        launcher.setSystemClassLoader(Maven31Main.class.getClassLoader());
-        launcher.configure(getClassWorldsConfStream());
-
+	    initializeLauncher();
 
         // create a realm for loading remoting subsystem.
         // this needs to be able to see maven.
@@ -175,13 +180,17 @@ public class Maven31Main
             throw new Error(e);
         }
     }
-
+    
     /**
      * Called by the code in remoting to launch.
      */
     public static int launch( String[] args ) throws Exception {
 
         try {
+            if (launcher == null) {
+                initializeLauncher();
+            }
+
             launcher.launch( args );
         } catch ( Throwable e ) {
             e.printStackTrace();
