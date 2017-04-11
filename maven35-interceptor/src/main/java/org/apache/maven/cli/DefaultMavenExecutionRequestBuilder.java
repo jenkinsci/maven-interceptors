@@ -42,6 +42,7 @@ import org.apache.maven.execution.*;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.settings.building.*;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.*;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -67,6 +68,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -175,8 +177,7 @@ public class DefaultMavenExecutionRequestBuilder
     }
 
 
-    private void initialize( CliRequest cliRequest )
-    {
+    private void initialize( CliRequest cliRequest ) throws IOException {
         if ( cliRequest.workingDirectory == null )
         {
             cliRequest.workingDirectory = System.getProperty( "user.dir" );
@@ -191,11 +192,17 @@ public class DefaultMavenExecutionRequestBuilder
         if ( mavenHome != null )
         {
             System.setProperty( "maven.home", new File( mavenHome ).getAbsolutePath() );
+            String mavenConf = System.getProperty("maven.conf");
+            if (mavenConf == null) {
+                System.setProperty("maven.conf", new File(System.getProperty("maven.home", System.getProperty("user.dir", "")), "conf").getCanonicalPath());
+
+            }
+
         }
     }
 
     private void cli( CliRequest cliRequest )
-        throws Exception
+            throws Exception
     {
         //
         // Parsing errors can happen during the processing of the arguments and we prefer not having to check if the logger is null
@@ -757,6 +764,7 @@ public class DefaultMavenExecutionRequestBuilder
         if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
         {
             request.setInteractiveMode( false );
+            MessageUtils.setColorEnabled(false);
         }
 
         boolean noSnapshotUpdates = false;
