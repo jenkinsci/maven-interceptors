@@ -32,6 +32,7 @@ import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jvnet.hudson.maven3.listeners.HudsonMavenExecutionResult;
@@ -82,7 +83,7 @@ public class Maven35Launcher
         hudsonMavenExecutionResult = result;
     }
 
-    public static int main( String[] args )
+    public static int main(String[] args , ClassWorld classWorld)
         throws Exception
     {
         ClassLoader orig = Thread.currentThread().getContextClassLoader();
