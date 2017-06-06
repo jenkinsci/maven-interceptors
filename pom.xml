@@ -32,7 +32,7 @@ THE SOFTWARE.
   
   <groupId>org.jenkins-ci.main.maven</groupId>
   <artifactId>maven-modules</artifactId>
-  <version>1.9</version>
+  <version>1.9-SNAPSHOT</version>
   <packaging>pom</packaging>
   
   <name>Jenkins Maven Agents and Interceptors</name>
@@ -57,7 +57,6 @@ THE SOFTWARE.
     <connection>scm:git:git://github.com/jenkinsci/maven-interceptors.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/jenkinsci/maven-interceptors.git</developerConnection>
     <url>https://github.com/jenkinsci/maven-interceptors</url>
-    <tag>maven-modules-1.9</tag>
   </scm>
   
   <properties>
