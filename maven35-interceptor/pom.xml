@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci.main.maven</groupId>
     <artifactId>maven-modules</artifactId>
-    <version>1.10</version>
+    <version>1.11-SNAPSHOT</version>
   </parent>
   <artifactId>maven35-interceptor</artifactId>
   <name>Jenkins Maven3.5.x Interceptor</name>
