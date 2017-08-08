@@ -25,7 +25,7 @@
       <artifactId>maven-aether-provider</artifactId>
       <version>${maven3.0.x.version}</version>
     </dependency>
-    <!-- Upper bound coming from org.apache.maven.wagon:wagon-provider-api:2.4 -->
+    <!-- Upper bound coming from org.apache.maven:maven-core:3.3.1 -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
