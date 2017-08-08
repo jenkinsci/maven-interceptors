@@ -28,7 +28,16 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
-    </dependency>                    
+    </dependency>
+    
+    <!-- Upper bound coming from org.apache.maven:maven-embedder:3.0.5 -->
+    <!-- TODO: Remove once upper bound issues are resolved in Maven Embedded -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>3.0.8</version>
+    </dependency>
+                                                                
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

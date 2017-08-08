@@ -67,7 +67,7 @@ THE SOFTWARE.
     <maven3.2.x.version>3.2.3</maven3.2.x.version>
     <maven3.3.x.version>3.3.1</maven3.3.x.version>
     <maven3.5.x.version>3.5.0</maven3.5.x.version>
-    <aetherVersion>1.13</aetherVersion>
+    <aetherVersion>1.13.1</aetherVersion>
     <sisuInjectVersion>2.3.0</sisuInjectVersion>
     <wagonVersion>2.4</wagonVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

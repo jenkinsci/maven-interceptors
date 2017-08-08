@@ -45,6 +45,13 @@ THE SOFTWARE.
       <version>2.0.9</version>
       <scope>provided</scope>
     </dependency>
+    
+    <!-- Upper bound coming from org.apache.maven.wagon:wagon-provider-api:2.4 -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>3.0.8</version>
+    </dependency>
 
     <dependency>
       <groupId>classworlds</groupId>
