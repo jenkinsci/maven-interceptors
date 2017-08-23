@@ -29,6 +29,12 @@
       <artifactId>maven-aether-provider</artifactId>
       <version>${maven3.1.x.version}</version>
     </dependency>
+    <!-- Upper bound coming from org.apache.maven:maven-core:3.1.0 -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>3.0.10</version>
+    </dependency>
 
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
