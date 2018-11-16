@@ -174,7 +174,13 @@ THE SOFTWARE.
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-inject-plexus</artifactId>
         <version>${sisuInjectVersion}</version>
-      </dependency>  
+      </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>3.0.24</version>
+      </dependency>
 
       <dependency>
         <groupId>org.apache.ant</groupId>
