@@ -40,7 +40,6 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>3.0.17</version>
     </dependency>
     <!-- Upper bound from org.apache.maven:maven-embedder:3.2.3 -->
     <dependency>
