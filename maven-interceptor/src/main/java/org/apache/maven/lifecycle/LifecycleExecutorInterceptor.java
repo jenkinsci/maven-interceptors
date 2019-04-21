@@ -80,7 +80,7 @@ public class LifecycleExecutorInterceptor extends DefaultLifecycleExecutor {
      * {@link EventMonitor} offers mostly useless events, but this offers
      * the most accurate "end of module" event.
      */
-    private final class EventMonitorImpl implements EventMonitor {
+    private static final class EventMonitorImpl implements EventMonitor {
         public void startEvent(String eventName, String target, long timestamp) {
             // TODO
         }

@@ -33,9 +33,9 @@ import org.apache.maven.project.MavenProject;
  */
 public class HudsonMavenExecutionResult implements Serializable
 {
-    List<Throwable> throwables = new ArrayList<Throwable>();
+    List<Throwable> throwables = new ArrayList<>();
     
-    List<MavenProjectInfo> mavenProjectInfos = new ArrayList<MavenProjectInfo>();
+    List<MavenProjectInfo> mavenProjectInfos = new ArrayList<>();
     
     public HudsonMavenExecutionResult(MavenExecutionResult mavenExecutionResult)
     {

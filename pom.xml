@@ -27,7 +27,7 @@ THE SOFTWARE.
   <parent>
     <groupId>org.jenkins-ci</groupId>
     <artifactId>jenkins</artifactId>
-    <version>1.39</version>
+    <version>1.51</version>
   </parent>
   
   <groupId>org.jenkins-ci.main.maven</groupId>
@@ -61,12 +61,12 @@ THE SOFTWARE.
   </scm>
   
   <properties>
-    <java.level>7</java.level>
+    <java.level>8</java.level>
     <maven3.0.x.version>3.0.5</maven3.0.x.version>
     <maven3.1.x.version>3.1.0</maven3.1.x.version>
     <maven3.2.x.version>3.2.3</maven3.2.x.version>
     <maven3.3.x.version>3.3.1</maven3.3.x.version>
-    <maven3.5.x.version>3.5.0</maven3.5.x.version>
+    <maven3.5.x.version>3.5.4</maven3.5.x.version>
     <aetherVersion>1.13.1</aetherVersion>
     <sisuInjectVersion>2.3.0</sisuInjectVersion>
     <wagonVersion>2.4</wagonVersion>
@@ -179,7 +179,7 @@ THE SOFTWARE.
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>3.0.24</version>
+        <version>3.1.0</version>
       </dependency>
 
       <dependency>
@@ -201,6 +201,14 @@ THE SOFTWARE.
       </dependency>  
     </dependencies>
   </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>annotations</artifactId>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
 
   <profiles>
     <profile>

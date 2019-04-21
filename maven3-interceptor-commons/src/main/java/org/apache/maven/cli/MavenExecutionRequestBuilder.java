@@ -20,12 +20,11 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import java.io.PrintStream;
-
-import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.settings.building.SettingsBuildingException;
+
+import java.io.PrintStream;
 
 /**
  * @author Olivier Lamy

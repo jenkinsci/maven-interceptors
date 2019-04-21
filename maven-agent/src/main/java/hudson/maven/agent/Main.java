@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.codehaus.classworlds.ClassRealm;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.DefaultClassRealm;
@@ -83,6 +84,7 @@ public class Main {
      * @param interceptorOverrideJar
      *      Possibly null override jar to be placed in front of maven-interceptor.jar
      */
+    @SuppressFBWarnings("OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE")
     public static void main(File m2Home, File remotingJar, File interceptorJar, int tcpPort, File interceptorOverrideJar) throws Exception {
         // Unix master with Windows slave ends up passing path in Unix format,
         // so convert it to Windows format now so that no one chokes with the path format later.
