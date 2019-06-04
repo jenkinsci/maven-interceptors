@@ -20,17 +20,7 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-import java.util.StringTokenizer;
-
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -40,7 +30,6 @@ import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.lifecycle.internal.LifecycleWeaveBuilder;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.properties.internal.EnvironmentUtils;
-import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingException;
@@ -56,13 +45,21 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.aether.impl.internal.EnhancedLocalRepositoryManager;
 import org.sonatype.aether.transfer.TransferListener;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
 import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+import java.util.StringTokenizer;
 
 /**
  * Most of code is coming from asf svn repo waiting before having available
@@ -226,6 +223,7 @@ public class DefaultMavenExecutionRequestBuilder
         }
     }
 
+    @SuppressFBWarnings("DM_DEFAULT_ENCODING")
     private void logging( CliRequest cliRequest )
     {
         cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
@@ -754,6 +752,7 @@ public class DefaultMavenExecutionRequestBuilder
         }
     }
 
+    @SuppressFBWarnings("URF_UNREAD_FIELD")
     static class CliRequest
     {
         String[] args;

@@ -21,6 +21,7 @@ package org.apache.maven.cli;
  */
 
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.InternalErrorException;
@@ -239,6 +240,7 @@ public class DefaultMavenExecutionRequestBuilder
     /**
      * configure logging
      */
+    @SuppressFBWarnings({"DM_DEFAULT_ENCODING","URF_UNREAD_FIELD"})
     private void logging( CliRequest cliRequest )
     {
         cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
@@ -998,16 +1000,15 @@ public class DefaultMavenExecutionRequestBuilder
             request.setLocalRepositoryPath( localRepoProperty );
         }
 
-        final String threadConfiguration = commandLine.hasOption( CLIManager.THREADS )
-            ? commandLine.getOptionValue( CLIManager.THREADS )
-            : request.getSystemProperties().getProperty(
-                MavenCli.THREADS_DEPRECATED ); // TODO: Remove this setting. Note that the int-tests use it
-
-        if ( threadConfiguration != null )
+        if ( commandLine.hasOption( CLIManager.THREADS ) )
         {
+            final String threadConfiguration = commandLine.getOptionValue( CLIManager.THREADS );
         	int threadCount = 1;
         	try {
-        		threadCount = Integer.parseInt(threadConfiguration.replace( "C", "" ).replace( "W", "" ).replace( "auto", "" ));
+        		threadCount = Integer.parseInt(threadConfiguration
+                                                   .replace( "C", "" )
+                                                   .replace( "W", "" )
+                                                   .replace( "auto", "" ));
         	} catch (NumberFormatException e) {
         		throw new IllegalArgumentException("Must provide a thread count for -T");
         	}

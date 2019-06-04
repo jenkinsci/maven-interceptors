@@ -51,11 +51,10 @@ THE SOFTWARE.
         </configuration>
       </plugin>
       <plugin>
-        <!-- compile with 1.2 so that we can report JDK version errors nicely -->
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.2</source>
-          <target>1.2</target>
+          <source>1.5</source>
+          <target>1.5</target>
         </configuration>
       </plugin>
       <plugin>

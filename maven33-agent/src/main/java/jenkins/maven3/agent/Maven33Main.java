@@ -23,6 +23,7 @@
  */
 package jenkins.maven3.agent;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.codehaus.plexus.classworlds.launcher.Launcher;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
@@ -91,6 +92,7 @@ public class Maven33Main
      *            TCP socket that the launching Hudson will be listening to.
      *            This is used for the remoting communication.
      */
+    @SuppressFBWarnings({"DB_DUPLICATE_BRANCHES","NP_LOAD_OF_KNOWN_NULL_VALUE","NP_NULL_ON_SOME_PATH"})
 	public static void main(File m2Home, File remotingJar, File interceptorJar,
                             File interceptorCommonJar, String agentIp, int tcpPort) throws Exception {
         // Unix master with Windows slave ends up passing path in Unix format,
