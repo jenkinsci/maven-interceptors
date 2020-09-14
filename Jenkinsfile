@@ -1,15 +1,6 @@
-pipeline {
-    agent { docker 'maven:3-alpine' }
-    stages {
-        stage('Build') {
-            steps {
-                sh 'mvn -B -U -e clean install'
-            }
-        }
-    }
-    post {
-        always {
-            junit '**/surefire-reports/**/*.xml'
-        }
-    }
-}
+// Builds a module using https://github.com/jenkins-infra/pipeline-library
+buildPlugin(useAci: true, configurations: [
+        [ platform: "linux", jdk: "8" ],
+        [ platform: "windows", jdk: "8" ],
+        [ platform: "linux", jdk: "11", jenkins: "2.222.3" ]
+])
