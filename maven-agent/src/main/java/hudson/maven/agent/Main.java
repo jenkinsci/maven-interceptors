@@ -65,6 +65,7 @@ public class Main {
      */
     private static boolean is206OrLater;
 
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     public static void main(String[] args) throws Exception {
         main(new File(args[0]),new File(args[1]),new File(args[2]),Integer.parseInt(args[3]),
                 args.length==4?null:new File(args[4]));
@@ -84,7 +85,7 @@ public class Main {
      * @param interceptorOverrideJar
      *      Possibly null override jar to be placed in front of maven-interceptor.jar
      */
-    @SuppressFBWarnings("OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE")
+    @SuppressFBWarnings({"OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE","UNENCRYPTED_SOCKET"})
     public static void main(File m2Home, File remotingJar, File interceptorJar, int tcpPort, File interceptorOverrideJar) throws Exception {
         // Unix master with Windows slave ends up passing path in Unix format,
         // so convert it to Windows format now so that no one chokes with the path format later.

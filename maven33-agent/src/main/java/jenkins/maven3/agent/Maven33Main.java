@@ -55,6 +55,7 @@ public class Maven33Main
      */
     private static Launcher launcher;
 
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     public static void main(String... args) throws Exception {
         String slaveAgentSocket = args[4];
         int i = slaveAgentSocket.indexOf(':');
@@ -92,7 +93,7 @@ public class Maven33Main
      *            TCP socket that the launching Hudson will be listening to.
      *            This is used for the remoting communication.
      */
-    @SuppressFBWarnings({"DB_DUPLICATE_BRANCHES","NP_LOAD_OF_KNOWN_NULL_VALUE","NP_NULL_ON_SOME_PATH"})
+    @SuppressFBWarnings({"DB_DUPLICATE_BRANCHES","NP_LOAD_OF_KNOWN_NULL_VALUE","NP_NULL_ON_SOME_PATH","UNENCRYPTED_SOCKET"})
 	public static void main(File m2Home, File remotingJar, File interceptorJar,
                             File interceptorCommonJar, String agentIp, int tcpPort) throws Exception {
         // Unix master with Windows slave ends up passing path in Unix format,

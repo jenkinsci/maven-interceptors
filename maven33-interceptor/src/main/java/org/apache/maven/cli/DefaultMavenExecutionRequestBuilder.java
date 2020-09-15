@@ -232,7 +232,7 @@ public class DefaultMavenExecutionRequestBuilder
     /**
      * configure logging
      */
-    @SuppressFBWarnings({"DM_DEFAULT_ENCODING","URF_UNREAD_FIELD"})
+    @SuppressFBWarnings({"DM_DEFAULT_ENCODING","URF_UNREAD_FIELD","PATH_TRAVERSAL_IN"})
     private void logging( CliRequest cliRequest )
     {
         cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
@@ -379,6 +379,7 @@ public class DefaultMavenExecutionRequestBuilder
     **/
 
     // FIXME this must be done!!!
+    @SuppressFBWarnings({"PATH_TRAVERSAL_IN"})
     private ClassRealm setupContainerRealm( CliRequest cliRequest )
         throws Exception
     {
@@ -639,6 +640,7 @@ public class DefaultMavenExecutionRequestBuilder
         }
     }
 
+    @SuppressFBWarnings({"PATH_TRAVERSAL_IN"})
     private void settings( CliRequest cliRequest )
         throws Exception
     {
@@ -732,6 +734,7 @@ public class DefaultMavenExecutionRequestBuilder
         return file;
     }
 
+    @SuppressFBWarnings({"PATH_TRAVERSAL_IN"})
     private MavenExecutionRequest populateRequest( CliRequest cliRequest )
     {
         MavenExecutionRequest request = cliRequest.request;
@@ -1019,6 +1022,7 @@ public class DefaultMavenExecutionRequestBuilder
         return request;
     }
 
+    @SuppressFBWarnings({"PATH_TRAVERSAL_IN"})
     static File resolveFile( File file, String workingDirectory )
     {
         if ( file == null )
