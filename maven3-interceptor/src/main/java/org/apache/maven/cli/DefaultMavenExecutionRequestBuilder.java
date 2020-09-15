@@ -134,6 +134,7 @@ public class DefaultMavenExecutionRequestBuilder
 
     }
 
+    @SuppressFBWarnings({"PATH_TRAVERSAL_IN"})
     static File resolveFile( File file, String workingDirectory )
     {
         if ( file == null )
@@ -223,7 +224,7 @@ public class DefaultMavenExecutionRequestBuilder
         }
     }
 
-    @SuppressFBWarnings("DM_DEFAULT_ENCODING")
+    @SuppressFBWarnings({"DM_DEFAULT_ENCODING","PATH_TRAVERSAL_IN"})
     private void logging( CliRequest cliRequest )
     {
         cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
@@ -364,6 +365,7 @@ public class DefaultMavenExecutionRequestBuilder
         System.setProperty( name, value );
     }
 
+    @SuppressFBWarnings({"PATH_TRAVERSAL_IN"})
     private void settings( CliRequest cliRequest )
         throws Exception
     {
@@ -433,6 +435,7 @@ public class DefaultMavenExecutionRequestBuilder
         }
     }
 
+    @SuppressFBWarnings({"PATH_TRAVERSAL_IN"})
     private MavenExecutionRequest populateRequest( CliRequest cliRequest )
     {
         MavenExecutionRequest request = cliRequest.request;
