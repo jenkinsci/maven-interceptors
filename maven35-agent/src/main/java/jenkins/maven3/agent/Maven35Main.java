@@ -162,8 +162,8 @@ public class Maven35Main
     public static void addPlexusComponents(URL[] modules) {
         try {
             ClassRealm realm = launcher.getWorld().getRealm("plexus.core");
-            for (int i=0; i<modules.length; i++) {
-                realm.addURL(modules[i]);
+            for (URL url : modules) {
+                realm.addURL(url);
             }
         } catch (NoSuchRealmException e) {
             throw new Error(e);

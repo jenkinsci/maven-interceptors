@@ -40,7 +40,6 @@ import org.jvnet.hudson.maven3.listeners.HudsonMavenExecutionResult;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Olivier Lamy
@@ -111,7 +110,7 @@ public class Maven31Launcher
                 List<EventSpy> eventSpies = eventSpyDispatcher.getEventSpies();
                 if ( eventSpies == null )
                 {
-                    eventSpies = new ArrayList<EventSpy>( 1 );
+                    eventSpies = new ArrayList<>( 1 );
                 }
                 eventSpies.addAll( eventSpiesList );
 

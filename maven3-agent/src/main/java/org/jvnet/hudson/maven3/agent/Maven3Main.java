@@ -54,6 +54,7 @@ import java.net.URL;
  * @author Olivier Lamy
  */
 public class Maven3Main {
+
     /**
      * Used to pass the classworld instance to the code running inside the
      * remoting system.
@@ -132,12 +133,12 @@ public class Maven3Main {
         // create a realm for loading remoting subsystem.
         // this needs to be able to see maven.
         ClassRealm remoting = launcher.getWorld().newRealm( "hudson-remoting", launcher.getSystemClassLoader() );
-        remoting.setParentRealm(launcher.getWorld().getRealm("plexus.core"));
+        remoting.setParentRealm(launcher.getWorld().getRealm( "plexus.core" ));
         remoting.addURL(remotingJar.toURI().toURL());
 
 	    final Socket s = new Socket(agentIp,tcpPort);
 
-        Class remotingLauncher = remoting.loadClass("hudson.remoting.Launcher");
+        Class<?> remotingLauncher = remoting.loadClass("hudson.remoting.Launcher");
         remotingLauncher.getMethod("main",
                 new Class[] { InputStream.class, OutputStream.class }).invoke(
                 null,
@@ -166,8 +167,8 @@ public class Maven3Main {
     public static void addPlexusComponents(URL[] modules) {
         try {
             ClassRealm realm = launcher.getWorld().getRealm("plexus.core");
-            for (int i=0; i<modules.length; i++) {
-                realm.addURL(modules[i]);
+            for (URL url : modules) {
+                realm.addURL(url);
             }
         } catch (NoSuchRealmException e) {
             throw new Error(e);
