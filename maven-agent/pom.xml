@@ -99,7 +99,7 @@ THE SOFTWARE.
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
       <artifactId>remoting</artifactId>
-      <version>1.401</version>
+      <version>4.8</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
