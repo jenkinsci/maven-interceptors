@@ -44,6 +44,8 @@ import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.DefaultClassRealm;
 import org.codehaus.classworlds.Launcher;
 import org.codehaus.classworlds.NoSuchRealmException;
+import org.codehaus.classworlds.DuplicateRealmException;
+import org.codehaus.classworlds.ConfigurationException;
 
 /**
  * Entry point for launching Maven and Hudson remoting in the same VM,
@@ -69,6 +71,15 @@ public class Main {
     public static void main(String[] args) throws Exception {
         main(new File(args[0]),new File(args[1]),new File(args[2]),Integer.parseInt(args[3]),
                 args.length==4?null:new File(args[4]));
+    }
+    
+    private static void initializeLauncher()
+	    throws IOException, ConfigurationException, DuplicateRealmException, NoSuchRealmException {
+        // load the default realms
+        launcher = new Launcher();
+        launcher.setSystemClassLoader(Main.class.getClassLoader());
+        launcher.configure(Main.class.getResourceAsStream(
+            is206OrLater ?"classworlds-2.0.6.conf":"classworlds.conf"));
     }
 
     /**
@@ -111,11 +122,7 @@ public class Main {
 
         is206OrLater = !new File(m2Home,"core").exists();
 
-        // load the default realms
-        launcher = new Launcher();
-        launcher.setSystemClassLoader(Main.class.getClassLoader());
-        launcher.configure(Main.class.getResourceAsStream(
-            is206OrLater ?"classworlds-2.0.6.conf":"classworlds.conf"));
+        initializeLauncher();
 
         // have it eventually delegate to this class so that this can be visible
 
@@ -198,8 +205,13 @@ public class Main {
     /**
      * Called by the code in remoting to launch.
      */
-    public static int launch(String[] args) throws NoSuchMethodException, IllegalAccessException, NoSuchRealmException, InvocationTargetException, ClassNotFoundException {
+    public static int launch(String[] args)
+        throws NoSuchMethodException, IllegalAccessException, NoSuchRealmException, DuplicateRealmException,
+                IOException, InvocationTargetException, ClassNotFoundException, ConfigurationException {
         //ClassWorld world = ClassWorldAdapter.getInstance( launcher.getWorld() );
+        if (launcher == null) {
+            initializeLauncher();
+        }
 
         ClassWorld world = launcher.getWorld();
         
