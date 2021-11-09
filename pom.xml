@@ -62,7 +62,7 @@ THE SOFTWARE.
   
   <properties>
     <java.level>8</java.level>
-    <maven3.0.x.version>3.0.5</maven3.0.x.version>
+    <maven3.0.x.version>3.3.9</maven3.0.x.version>
     <maven3.1.x.version>3.1.0</maven3.1.x.version>
     <maven3.2.x.version>3.2.3</maven3.2.x.version>
     <maven3.3.x.version>3.3.1</maven3.3.x.version>
@@ -204,9 +204,9 @@ THE SOFTWARE.
 
   <dependencies>
     <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>annotations</artifactId>
-      <version>3.0.0</version>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+      <version>${spotbugs-annotations.version}</version>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
