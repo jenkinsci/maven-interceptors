@@ -27,6 +27,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
+import org.apache.maven.cli.configuration.ConfigurationProcessor;
+import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cli.logging.Slf4jConfiguration;
@@ -38,13 +40,18 @@ import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.ExceptionSummary;
-import org.apache.maven.execution.*;
+import org.apache.maven.execution.ExecutionListener;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequestPopulationException;
+import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.settings.building.*;
-import org.apache.maven.toolchain.building.*;
+import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
+import org.apache.maven.toolchain.building.ToolchainsBuilder;
+import org.apache.maven.toolchain.building.ToolchainsBuildingException;
+import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -63,10 +70,7 @@ import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
 import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -96,6 +100,8 @@ public class DefaultMavenExecutionRequestBuilder
 
     private DefaultSecDispatcher dispatcher;
 
+    private Map<String, ConfigurationProcessor> configurationProcessors;
+
     private LoggerManager plexusLoggerManager;
 
     private Logger slf4jLogger;
@@ -107,7 +113,7 @@ public class DefaultMavenExecutionRequestBuilder
     private ToolchainsBuilder toolchainsBuilder;
 
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
-    
+
     static final String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyyMMdd-HHmm";
 
     public void initialize()
@@ -121,7 +127,7 @@ public class DefaultMavenExecutionRequestBuilder
             executionRequestPopulator = plexusContainer.lookup( MavenExecutionRequestPopulator.class );
             settingsBuilder = plexusContainer.lookup( SettingsBuilder.class );
             toolchainsBuilder = plexusContainer.lookup( ToolchainsBuilder.class );
-
+            configurationProcessors = plexusContainer.lookupMap( ConfigurationProcessor.class );
         }
         catch ( ComponentLookupException e )
         {
@@ -130,7 +136,7 @@ public class DefaultMavenExecutionRequestBuilder
     }
 
     /**
-     * @throws MavenExecutionRequestPopulationException 
+     * @throws MavenExecutionRequestPopulationException
      */
     public MavenExecutionRequest getMavenExecutionRequest( String[] args, PrintStream printStream)
         throws MavenExecutionRequestPopulationException, SettingsBuildingException,
@@ -146,14 +152,6 @@ public class DefaultMavenExecutionRequestBuilder
             properties( cliRequest );
             // we are in a container so no need
             //localContainer = container( cliRequest );
-            commands( cliRequest );
-            settings( cliRequest );
-            populateRequest( cliRequest );
-            toolchains( cliRequest );
-            encryption( cliRequest );
-            repository( cliRequest );
-
-            MavenExecutionRequest request = executionRequestPopulator.populateDefaults( cliRequest.request );
 
             DefaultEventSpyContext eventSpyContext = new DefaultEventSpyContext();
             Map<String, Object> data = eventSpyContext.getData();
@@ -164,8 +162,15 @@ public class DefaultMavenExecutionRequestBuilder
             data.put( "versionProperties", CLIReportingUtils.getBuildProperties() );
             eventSpyDispatcher.init( eventSpyContext );
 
+            commands( cliRequest );
+//            settings( cliRequest );
+            configure( cliRequest );
+            populateRequest( cliRequest );
+            toolchains( cliRequest );
+            encryption( cliRequest );
+            repository( cliRequest );
 
-            return request;
+            return executionRequestPopulator.populateDefaults( cliRequest.request );
         }
         catch ( Exception e )
         {
@@ -180,6 +185,19 @@ public class DefaultMavenExecutionRequestBuilder
         if ( cliRequest.workingDirectory == null )
         {
             cliRequest.workingDirectory = System.getProperty( "user.dir" );
+        }
+
+        if ( cliRequest.multiModuleProjectDirectory == null )
+        {
+            File basedir = new File( "" );
+            try
+            {
+                cliRequest.multiModuleProjectDirectory = basedir.getCanonicalFile();
+            }
+            catch ( IOException e )
+            {
+                cliRequest.multiModuleProjectDirectory = basedir.getAbsoluteFile();
+            }
         }
 
         //
@@ -620,17 +638,22 @@ public class DefaultMavenExecutionRequestBuilder
        throws Exception{
         DefaultToolchainsBuildingRequest toolchainsBuildingRequest = new DefaultToolchainsBuildingRequest();
         if (cliRequest.request.getUserToolchainsFile().isFile()) {
-            toolchainsBuildingRequest.setUserToolchainsSource(new FileSource(cliRequest.request.getUserToolchainsFile()));
+            toolchainsBuildingRequest.setUserToolchainsSource( new FileSource( cliRequest.request.getUserToolchainsFile() ) );
         }
         if (MavenCli.DEFAULT_GLOBAL_TOOLCHAINS_FILE.isFile()) {
-            toolchainsBuildingRequest.setGlobalToolchainsSource(new FileSource(MavenCli.DEFAULT_GLOBAL_TOOLCHAINS_FILE));
+            toolchainsBuildingRequest.setGlobalToolchainsSource( new FileSource( MavenCli.DEFAULT_GLOBAL_TOOLCHAINS_FILE ) );
         }
+
+        eventSpyDispatcher.onEvent( toolchainsBuildingRequest );
+
         slf4jLogger.debug( "Reading global toolchains from "
                 + getToolchainsLocation( toolchainsBuildingRequest.getGlobalToolchainsSource(), cliRequest.request.getGlobalToolchainsFile() ) );
         slf4jLogger.debug( "Reading user toolchains from "
                 + getToolchainsLocation( toolchainsBuildingRequest.getUserToolchainsSource(), cliRequest.request.getUserToolchainsFile() ) );
+
         try {
             ToolchainsBuildingResult toolchainsBuildingResult = toolchainsBuilder.build(toolchainsBuildingRequest);
+
             eventSpyDispatcher.onEvent( toolchainsBuildingRequest );
 
             executionRequestPopulator.populateFromToolchains( cliRequest.request,
@@ -714,6 +737,72 @@ public class DefaultMavenExecutionRequestBuilder
             }
 
             slf4jLogger.warn( "" );
+        }
+    }
+
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
+    private void configure(CliRequest cliRequest )
+        throws Exception
+    {
+        //
+        // This is not ideal but there are events specifically for configuration from the CLI which I don't
+        // believe are really valid but there are ITs which assert the right events are published so this
+        // needs to be supported so the EventSpyDispatcher needs to be put in the CliRequest so that
+        // it can be accessed by configuration processors.
+        //
+        cliRequest.request.setEventSpyDispatcher( eventSpyDispatcher );
+
+        //
+        // We expect at most 2 implementations to be available. The SettingsXmlConfigurationProcessor implementation
+        // is always available in the core and likely always will be, but we may have another ConfigurationProcessor
+        // present supplied by the user. The rule is that we only allow the execution of one ConfigurationProcessor.
+        // If there is more than one then we execute the one supplied by the user, otherwise we execute the
+        // the default SettingsXmlConfigurationProcessor.
+        //
+        int userSuppliedConfigurationProcessorCount = configurationProcessors.size() - 1;
+
+        if ( userSuppliedConfigurationProcessorCount == 0 )
+        {
+            //
+            // Our settings.xml source is historically how we have configured Maven from the CLI so we are going to
+            // have to honour its existence forever. So let's run it.
+            //
+            configurationProcessors.get( SettingsXmlConfigurationProcessor.HINT ).process( cliRequest );
+        }
+        else if ( userSuppliedConfigurationProcessorCount == 1 )
+        {
+            //
+            // Run the user supplied ConfigurationProcessor
+            //
+            for ( Map.Entry<String, ConfigurationProcessor> entry : configurationProcessors.entrySet() )
+            {
+                String hint = entry.getKey();
+                if ( !hint.equals( SettingsXmlConfigurationProcessor.HINT ) )
+                {
+                    ConfigurationProcessor configurationProcessor = entry.getValue();
+                    configurationProcessor.process( cliRequest );
+                }
+            }
+        }
+        else if ( userSuppliedConfigurationProcessorCount > 1 )
+        {
+            //
+            // There are too many ConfigurationProcessors so we don't know which one to run so report the error.
+            //
+            StringBuilder sb = new StringBuilder(
+                String.format( "\nThere can only be one user supplied ConfigurationProcessor, there are %s:\n\n",
+                    userSuppliedConfigurationProcessorCount ) );
+            for ( Map.Entry<String, ConfigurationProcessor> entry : configurationProcessors.entrySet() )
+            {
+                String hint = entry.getKey();
+                if ( !hint.equals( SettingsXmlConfigurationProcessor.HINT ) )
+                {
+                    ConfigurationProcessor configurationProcessor = entry.getValue();
+                    sb.append( String.format( "%s\n", configurationProcessor.getClass().getName() ) );
+                }
+            }
+            sb.append( String.format( "\n" ) );
+            throw new Exception( sb.toString() );
         }
     }
 
@@ -914,7 +1003,8 @@ public class DefaultMavenExecutionRequestBuilder
             .setUpdateSnapshots( updateSnapshots ) // default: false
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
             .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
-            .setUserToolchainsFile( userToolchainsFile );
+            .setUserToolchainsFile( userToolchainsFile )
+            .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
 
         if ( alternatePomFile != null )
         {
@@ -1118,27 +1208,6 @@ public class DefaultMavenExecutionRequestBuilder
         System.setProperty( name, value );
     }
 
-    static class CliRequest
-    {
-        String[] args;
-        CommandLine commandLine;
-        ClassWorld classWorld;
-        String workingDirectory;
-        boolean debug;
-        boolean quiet;
-        boolean showErrors = true;
-        Properties userProperties = new Properties();
-        Properties systemProperties = new Properties();
-        MavenExecutionRequest request;
-
-        CliRequest( String[] args, ClassWorld classWorld )
-        {
-            this.args = args;
-            this.classWorld = classWorld;
-            this.request = new DefaultMavenExecutionRequest();
-        }
-    }
-
     static class ExitException
         extends Exception
     {
@@ -1175,5 +1244,5 @@ public class DefaultMavenExecutionRequestBuilder
     {
         return container.lookup( ModelProcessor.class );
     }
-    
+
 }
