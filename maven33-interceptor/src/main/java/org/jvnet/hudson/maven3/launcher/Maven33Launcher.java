@@ -92,8 +92,11 @@ public class Maven33Launcher
             ClassRealm containerRealm = (ClassRealm) Thread.currentThread().getContextClassLoader();
 
             ContainerConfiguration cc =
-                new DefaultContainerConfiguration().setName( "maven" ).setRealm( containerRealm ).setClassPathScanning(
-                    PlexusConstants.SCANNING_INDEX ).setAutoWiring( true );
+                new DefaultContainerConfiguration()
+                    .setName( "maven" )
+                    .setRealm( containerRealm )
+                    .setClassPathScanning( PlexusConstants.SCANNING_INDEX )
+                    .setAutoWiring( true );
 
             DefaultPlexusContainer container = new DefaultPlexusContainer( cc );
             Slf4jLoggerManager mavenLoggerManager = new Slf4jLoggerManager();
@@ -108,28 +111,26 @@ public class Maven33Launcher
                 List<EventSpy> eventSpies = eventSpyDispatcher.getEventSpies();
                 if ( eventSpies == null )
                 {
-                    eventSpies = new ArrayList<EventSpy>( 1 );
+                    eventSpies = new ArrayList<>( 1 );
                 }
                 eventSpies.addAll( eventSpiesList );
-
-                // get event spies added with plexus components
-                // see Maven31Maven addPlexusComponents
-                // PlexusModuleContributor extension
-                List<EventSpy> spies = container.lookupList( EventSpy.class );
-                if (spies != null && !spies.isEmpty())
-                {
-                    eventSpies.addAll( spies );
-                }
 
                 eventSpyDispatcher.setEventSpies( eventSpies );
             }
 
             MavenExecutionRequest request = getMavenExecutionRequest( args, container );
 
+            eventSpyDispatcher.onEvent( request );
+
             MavenExecutionResult result = maven.execute( request );
+
+            eventSpyDispatcher.onEvent( result );
+
+            eventSpyDispatcher.close();
+
             hudsonMavenExecutionResult = new HudsonMavenExecutionResult( result );
 
-            // we don't care about cli mavenExecutionResult will be study in the the plugin
+            // we don't care about cli mavenExecutionResult will be study in the plugin
             return 0;// cli.doMain( args, null );
         }
         catch ( ComponentLookupException e )
