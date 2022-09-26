@@ -1,5 +1,6 @@
 package org.apache.maven.cli;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.cli.CommandLine;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -9,10 +10,12 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * Copied from Maven {@code 3.5.4}. Older versions might not fill in all the fields.
+ * Copied from {@code org.apache.maven.cli.CliRequest} from Maven {@code 3.5.4}. Older versions might not fill in
+ * all the fields.
  */
 public class CommonCliRequest
 {
+    @SuppressFBWarnings({ "EI_EXPOSE_REP", "EI_EXPOSE_REP2" })
     String[] args;
 
     CommandLine commandLine;
