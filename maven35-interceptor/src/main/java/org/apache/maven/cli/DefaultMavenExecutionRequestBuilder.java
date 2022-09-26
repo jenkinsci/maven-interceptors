@@ -23,7 +23,6 @@ package org.apache.maven.cli;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.ParseException;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
@@ -31,10 +30,6 @@ import org.apache.maven.cli.configuration.ConfigurationProcessor;
 import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
-import org.apache.maven.cli.logging.Slf4jConfiguration;
-import org.apache.maven.cli.logging.Slf4jConfigurationFactory;
-import org.apache.maven.cli.logging.Slf4jLoggerManager;
-import org.apache.maven.cli.logging.Slf4jStdoutLogger;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
@@ -45,8 +40,13 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.model.building.ModelProcessor;
-import org.apache.maven.properties.internal.EnvironmentUtils;
-import org.apache.maven.settings.building.*;
+import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
+import org.apache.maven.settings.building.SettingsBuilder;
+import org.apache.maven.settings.building.SettingsBuildingException;
+import org.apache.maven.settings.building.SettingsBuildingRequest;
+import org.apache.maven.settings.building.SettingsBuildingResult;
+import org.apache.maven.settings.building.SettingsProblem;
+import org.apache.maven.settings.building.SettingsSource;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
@@ -57,14 +57,12 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
@@ -73,10 +71,11 @@ import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * Most of code is coming from asf svn repo waiting before having available
@@ -95,9 +94,6 @@ public class DefaultMavenExecutionRequestBuilder
     private MavenExecutionRequestPopulator executionRequestPopulator;
 
     @Requirement
-    private Logger plexusLogger;
-
-    @Requirement
     private ModelProcessor modelProcessor;
 
     @Requirement
@@ -107,11 +103,7 @@ public class DefaultMavenExecutionRequestBuilder
 
     private Map<String, ConfigurationProcessor> configurationProcessors;
 
-    private LoggerManager plexusLoggerManager;
-
     private Logger slf4jLogger;
-
-    private ILoggerFactory slf4jLoggerFactory;
 
     private EventSpyDispatcher eventSpyDispatcher;
 
@@ -133,6 +125,7 @@ public class DefaultMavenExecutionRequestBuilder
             settingsBuilder = plexusContainer.lookup( SettingsBuilder.class );
             toolchainsBuilder = plexusContainer.lookup( ToolchainsBuilder.class );
             configurationProcessors = plexusContainer.lookupMap( ConfigurationProcessor.class );
+            slf4jLogger = plexusContainer.lookup( ILoggerFactory.class ).getLogger( this.getClass().getName() );
         }
         catch ( ComponentLookupException e )
         {
@@ -140,21 +133,14 @@ public class DefaultMavenExecutionRequestBuilder
         }
     }
 
-    /**
-     * @throws MavenExecutionRequestPopulationException
-     */
-    public MavenExecutionRequest getMavenExecutionRequest( String[] args, PrintStream printStream)
-        throws MavenExecutionRequestPopulationException, SettingsBuildingException,
-        MavenExecutionRequestsBuilderException
-    {
+    @Override
+    public MavenExecutionRequest getMavenExecutionRequest( CommonCliRequest commonCliRequest )
+        throws MavenExecutionRequestPopulationException, SettingsBuildingException, MavenExecutionRequestsBuilderException {
+
         try
         {
-            CliRequest cliRequest = new CliRequest( args, null );
-            initialize( cliRequest );
-            cli( cliRequest );
-            properties( cliRequest );
-            logging( cliRequest );
-            version( cliRequest );
+            CliRequest cliRequest = toCliRequest( commonCliRequest );
+
             // we are in a container so no need
             //localContainer = container( cliRequest );
 
@@ -181,143 +167,32 @@ public class DefaultMavenExecutionRequestBuilder
         {
             throw new MavenExecutionRequestsBuilderException( e.getMessage(), e );
         }
-
     }
 
+    private CliRequest toCliRequest( CommonCliRequest commonCliRequest ) {
+        CliRequest cliRequest = new CliRequest( commonCliRequest.args, null );
 
-    private void initialize( CliRequest cliRequest ) throws IOException {
-        if ( cliRequest.workingDirectory == null )
-        {
-            cliRequest.workingDirectory = System.getProperty( "user.dir" );
-        }
+        cliRequest.commandLine = commonCliRequest.commandLine;
+        cliRequest.classWorld = commonCliRequest.classWorld;
+        cliRequest.workingDirectory = commonCliRequest.workingDirectory;
+        cliRequest.multiModuleProjectDirectory = commonCliRequest.multiModuleProjectDirectory;
+        cliRequest.debug = commonCliRequest.debug;
+        cliRequest.quiet = commonCliRequest.quiet;
+        cliRequest.showErrors = commonCliRequest.showErrors;
+        cliRequest.userProperties = commonCliRequest.userProperties;
+        cliRequest.systemProperties = commonCliRequest.systemProperties;
+        cliRequest.request = commonCliRequest.request;
 
-        if ( cliRequest.multiModuleProjectDirectory == null )
-        {
-            File basedir = new File( "" );
-            try
-            {
-                cliRequest.multiModuleProjectDirectory = basedir.getCanonicalFile();
-            }
-            catch ( IOException e )
-            {
-                cliRequest.multiModuleProjectDirectory = basedir.getAbsoluteFile();
-            }
-        }
-
-        //
-        // Make sure the Maven home directory is an absolute path to save us from confusion with say drive-relative
-        // Windows paths.
-        //
-        String mavenHome = System.getProperty( "maven.home" );
-
-        if ( mavenHome != null )
-        {
-            System.setProperty( "maven.home", new File( mavenHome ).getAbsolutePath() );
-            String mavenConf = System.getProperty("maven.conf");
-            if (mavenConf == null) {
-                System.setProperty("maven.conf", new File(System.getProperty("maven.home", System.getProperty("user.dir", "")), "conf").getCanonicalPath());
-
-            }
-
-        }
-    }
-
-    private void cli( CliRequest cliRequest )
-            throws Exception
-    {
-        //
-        // Parsing errors can happen during the processing of the arguments and we prefer not having to check if the logger is null
-        // and construct this so we can use an SLF4J logger everywhere.
-        //
-        slf4jLogger = new Slf4jStdoutLogger();
-
-        CLIManager cliManager = new CLIManager();
-
-        try
-        {
-            cliRequest.commandLine = cliManager.parse( cliRequest.args );
-        }
-        catch ( ParseException e )
-        {
-            System.err.println( "Unable to parse command line options: " + e.getMessage() );
-            cliManager.displayHelp( System.out );
-            throw e;
-        }
-
-        if ( cliRequest.commandLine.hasOption( CLIManager.HELP ) )
-        {
-            cliManager.displayHelp( System.out );
-            throw new ExitException( 0 );
-        }
-
-        if ( cliRequest.commandLine.hasOption( CLIManager.VERSION ) )
-        {
-            System.out.println( CLIReportingUtils.showVersion() );
-            throw new ExitException( 0 );
-        }
+        return cliRequest;
     }
 
     /**
-     * configure logging
+     * @throws MavenExecutionRequestPopulationException
      */
-    @SuppressFBWarnings({"DM_DEFAULT_ENCODING","URF_UNREAD_FIELD","PATH_TRAVERSAL_IN"})
-    private void logging( CliRequest cliRequest )
+    public MavenExecutionRequest getMavenExecutionRequest( String[] args, PrintStream printStream)
+        throws MavenExecutionRequestPopulationException, SettingsBuildingException, MavenExecutionRequestsBuilderException
     {
-        cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
-        cliRequest.quiet = !cliRequest.debug && cliRequest.commandLine.hasOption( CLIManager.QUIET );
-        cliRequest.showErrors = cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.ERRORS );
-
-        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
-        Slf4jConfiguration slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration( slf4jLoggerFactory );
-
-        if ( cliRequest.debug )
-        {
-            cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
-            slf4jConfiguration.setRootLoggerLevel( Slf4jConfiguration.Level.DEBUG );
-        }
-        else if ( cliRequest.quiet )
-        {
-            cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_ERROR );
-            slf4jConfiguration.setRootLoggerLevel( Slf4jConfiguration.Level.ERROR );
-        }
-        else
-        {
-            cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_INFO );
-            slf4jConfiguration.setRootLoggerLevel( Slf4jConfiguration.Level.INFO );
-        }
-
-        if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
-        {
-            File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
-            logFile = resolveFile( logFile, cliRequest.workingDirectory );
-
-            // redirect stdout and stderr to file
-            try
-            {
-                PrintStream ps = new PrintStream( new FileOutputStream( logFile ) );
-                System.setOut( ps );
-                System.setErr( ps );
-            }
-            catch ( FileNotFoundException e )
-            {
-                //
-                // Ignore
-                //
-            }
-        }
-
-        slf4jConfiguration.activate();
-
-        plexusLoggerManager = new Slf4jLoggerManager();
-        slf4jLogger = slf4jLoggerFactory.getLogger( this.getClass().getName() );
-    }
-
-    private void version( CliRequest cliRequest )
-    {
-        if ( cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.SHOW_VERSION ) )
-        {
-            System.out.println( CLIReportingUtils.showVersion() );
-        }
+        throw new UnsupportedOperationException( "This method should not be called" );
     }
 
     private void commands( CliRequest cliRequest )
@@ -337,10 +212,6 @@ public class DefaultMavenExecutionRequestBuilder
         }
     }
 
-    private void properties( CliRequest cliRequest )
-    {
-        populateProperties( cliRequest.commandLine, cliRequest.systemProperties, cliRequest.userProperties );
-    }
     /**
     private PlexusContainer container( CliRequest cliRequest )
         throws Exception
@@ -1142,80 +1013,6 @@ public class DefaultMavenExecutionRequestBuilder
         {
             return new File( workingDirectory, file.getPath() ).getAbsoluteFile();
         }
-    }
-
-    // ----------------------------------------------------------------------
-    // System properties handling
-    // ----------------------------------------------------------------------
-
-    static void populateProperties( CommandLine commandLine, Properties systemProperties, Properties userProperties )
-    {
-        EnvironmentUtils.addEnvVars( systemProperties );
-
-        // ----------------------------------------------------------------------
-        // Options that are set on the command line become system properties
-        // and therefore are set in the session properties. System properties
-        // are most dominant.
-        // ----------------------------------------------------------------------
-
-        if ( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) )
-        {
-            String[] defStrs = commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
-
-            if ( defStrs != null )
-            {
-                for ( String defStr : defStrs )
-                {
-                    setCliProperty( defStr, userProperties );
-                }
-            }
-        }
-
-        systemProperties.putAll( System.getProperties() );
-
-        // ----------------------------------------------------------------------
-        // Properties containing info about the currently running version of Maven
-        // These override any corresponding properties set on the command line
-        // ----------------------------------------------------------------------
-
-        Properties buildProperties = CLIReportingUtils.getBuildProperties();
-
-        String mavenVersion = buildProperties.getProperty( CLIReportingUtils.BUILD_VERSION_PROPERTY );
-        systemProperties.setProperty( "maven.version", mavenVersion );
-
-        String mavenBuildVersion = CLIReportingUtils.createMavenVersionString( buildProperties );
-        systemProperties.setProperty( "maven.build.version", mavenBuildVersion );
-    }
-
-    private static void setCliProperty( String property, Properties properties )
-    {
-        String name;
-
-        String value;
-
-        int i = property.indexOf( "=" );
-
-        if ( i <= 0 )
-        {
-            name = property.trim();
-
-            value = "true";
-        }
-        else
-        {
-            name = property.substring( 0, i ).trim();
-
-            value = property.substring( i + 1 );
-        }
-
-        properties.setProperty( name, value );
-
-        // ----------------------------------------------------------------------
-        // I'm leaving the setting of system properties here as not to break
-        // the SystemPropertyProfileActivator. This won't harm embedding. jvz.
-        // ----------------------------------------------------------------------
-
-        System.setProperty( name, value );
     }
 
     static class ExitException

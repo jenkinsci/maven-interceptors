@@ -139,9 +139,17 @@ public class DefaultMavenExecutionRequestBuilder
         }
     }
 
+    @Override
+    public MavenExecutionRequest getMavenExecutionRequest( CommonCliRequest commonCliRequest )
+        throws MavenExecutionRequestPopulationException, SettingsBuildingException, MavenExecutionRequestsBuilderException
+    {
+        throw new UnsupportedOperationException( "This method should not be called" );
+    }
+
     /**
      * @throws MavenExecutionRequestPopulationException
      */
+    @Override
     public MavenExecutionRequest getMavenExecutionRequest( String[] args, PrintStream printStream)
         throws MavenExecutionRequestPopulationException, SettingsBuildingException,
         MavenExecutionRequestsBuilderException

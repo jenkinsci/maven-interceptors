@@ -116,7 +116,7 @@ public class DefaultMavenExecutionRequestBuilder
     private EventSpyDispatcher eventSpyDispatcher;
 
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
-    
+
     static final String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyyMMdd-HHmm";
 
     public void initialize()
@@ -137,9 +137,17 @@ public class DefaultMavenExecutionRequestBuilder
         }
     }
 
+    @Override
+    public MavenExecutionRequest getMavenExecutionRequest( CommonCliRequest commonCliRequest )
+        throws MavenExecutionRequestPopulationException, SettingsBuildingException, MavenExecutionRequestsBuilderException
+    {
+        throw new UnsupportedOperationException( "This method should not be called" );
+    }
+
     /**
-     * @throws MavenExecutionRequestPopulationException 
+     * @throws MavenExecutionRequestPopulationException
      */
+    @Override
     public MavenExecutionRequest getMavenExecutionRequest( String[] args, PrintStream printStream)
         throws MavenExecutionRequestPopulationException, SettingsBuildingException,
         MavenExecutionRequestsBuilderException
@@ -1148,5 +1156,5 @@ public class DefaultMavenExecutionRequestBuilder
     {
         return container.lookup( ModelProcessor.class );
     }
-    
+
 }

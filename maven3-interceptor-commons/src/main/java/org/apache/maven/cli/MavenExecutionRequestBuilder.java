@@ -33,4 +33,7 @@ public interface MavenExecutionRequestBuilder
 {
     MavenExecutionRequest getMavenExecutionRequest( String[] args, PrintStream printStream)
         throws MavenExecutionRequestPopulationException, SettingsBuildingException, MavenExecutionRequestsBuilderException;
+
+    MavenExecutionRequest getMavenExecutionRequest( CommonCliRequest commonCliRequest )
+        throws MavenExecutionRequestPopulationException, SettingsBuildingException, MavenExecutionRequestsBuilderException;
 }
