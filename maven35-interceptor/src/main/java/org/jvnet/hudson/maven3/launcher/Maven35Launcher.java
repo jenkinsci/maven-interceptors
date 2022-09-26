@@ -106,7 +106,7 @@ public class Maven35Launcher
             CommonCliRequestFactory commonCliRequestFactory = new CommonCliRequestFactory();
             CommonCliRequest commonCliRequest = commonCliRequestFactory.create( args );
 
-            DefaultPlexusContainer container = new DefaultPlexusContainer(cc, new AbstractModule() {
+            DefaultPlexusContainer container = new DefaultPlexusContainer( cc, new AbstractModule() {
 
                 @Override
                 protected void configure() {
