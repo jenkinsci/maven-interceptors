@@ -86,7 +86,7 @@ public class DefaultMavenExecutionRequestBuilder
     private PlexusContainer plexusContainer;
 
     private DefaultSecDispatcher dispatcher;
-    
+
     public void initialize()
         throws InitializationException
     {
@@ -100,10 +100,18 @@ public class DefaultMavenExecutionRequestBuilder
         }
     }
 
+    @Override
+    public MavenExecutionRequest getMavenExecutionRequest( CommonCliRequest commonCliRequest )
+        throws MavenExecutionRequestPopulationException, SettingsBuildingException, MavenExecutionRequestsBuilderException
+    {
+        throw new UnsupportedOperationException( "This method should not be called" );
+    }
+
     /**
-     * @throws MavenExecutionRequestPopulationException 
+     * @throws MavenExecutionRequestPopulationException
      * @see org.jvnet.hudson.maven3.MavenExecutionRequestBuilder.MavenExecutionRequestsBuilder#getMavenExecutionRequest(java.lang.String[])
      */
+    @Override
     public MavenExecutionRequest getMavenExecutionRequest( String[] args, PrintStream printStream )
         throws MavenExecutionRequestPopulationException, SettingsBuildingException,
         MavenExecutionRequestsBuilderException
@@ -124,7 +132,7 @@ public class DefaultMavenExecutionRequestBuilder
             encryption( cliRequest );
 
             MavenExecutionRequest request = executionRequestPopulator.populateDefaults( cliRequest.request );
-                        
+
             return request;
         }
         catch ( Exception e )
@@ -779,6 +787,6 @@ public class DefaultMavenExecutionRequestBuilder
             this.classWorld = classWorld;
             this.request = new DefaultMavenExecutionRequest();
         }
-    }    
-    
+    }
+
 }
