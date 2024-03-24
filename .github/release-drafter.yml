@@ -1,2 +1,6 @@
 _extends: .github
 tag-template: maven-modules-$NEXT_MINOR_VERSION
+template: |
+  ## What’s Changed
+
+  $CHANGES
