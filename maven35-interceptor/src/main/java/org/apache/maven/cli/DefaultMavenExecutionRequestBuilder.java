@@ -704,8 +704,25 @@ public class DefaultMavenExecutionRequestBuilder
         return file;
     }
 
+    private static void disableBatchModeColor() throws ReflectiveOperationException
+    {
+        // Maven 3.10 moved this class out of maven-shared-utils.
+        Class<?> messageUtils;
+        try
+        {
+            messageUtils = Class.forName( "org.apache.maven.jline.MessageUtils" );
+        }
+        catch ( ClassNotFoundException olderMaven )
+        {
+            MessageUtils.setColorEnabled( false );
+            return;
+        }
+        messageUtils.getMethod( "setColorEnabled", boolean.class ).invoke( null, false );
+    }
+
     @SuppressFBWarnings({"PATH_TRAVERSAL_IN"})
     private MavenExecutionRequest populateRequest( CliRequest cliRequest )
+        throws ReflectiveOperationException
     {
         MavenExecutionRequest request = cliRequest.request;
         CommandLine commandLine = cliRequest.commandLine;
@@ -731,7 +748,7 @@ public class DefaultMavenExecutionRequestBuilder
         if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
         {
             request.setInteractiveMode( false );
-            MessageUtils.setColorEnabled(false);
+            disableBatchModeColor();
         }
 
         boolean noSnapshotUpdates = false;
