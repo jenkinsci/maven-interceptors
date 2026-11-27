@@ -21,6 +21,7 @@ package org.jvnet.hudson.maven3.launcher;
  */
 
 import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 import org.apache.maven.Maven;
 import org.apache.maven.cli.CommonCliRequest;
 import org.apache.maven.cli.CommonCliRequestFactory;
@@ -40,7 +41,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.jvnet.hudson.maven3.listeners.HudsonMavenExecutionResult;
 import org.slf4j.ILoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -111,23 +111,21 @@ public class Maven35Launcher
                 @Override
                 protected void configure() {
                     bind( ILoggerFactory.class ).toInstance( commonCliRequestFactory.getSlf4jLoggerFactory() );
+                    // Let Maven discover the spies when it constructs the dispatcher.
+                    if ( eventSpiesList != null )
+                    {
+                        int index = 0;
+                        for ( EventSpy eventSpy : eventSpiesList )
+                        {
+                            bind( EventSpy.class ).annotatedWith( Names.named( "jenkins-event-spy-" + index++ ) )
+                                .toInstance( eventSpy );
+                        }
+                    }
                 }
             });
             container.setLoggerManager( commonCliRequestFactory.getPlexusLoggerManager() );
 
             EventSpyDispatcher eventSpyDispatcher = container.lookup( EventSpyDispatcher.class );
-
-            if ( eventSpiesList != null && !eventSpiesList.isEmpty())
-            {
-                List<EventSpy> eventSpies = eventSpyDispatcher.getEventSpies();
-                if ( eventSpies == null )
-                {
-                    eventSpies = new ArrayList<>( 1 );
-                }
-                eventSpies.addAll( eventSpiesList );
-
-                eventSpyDispatcher.setEventSpies( eventSpies );
-            }
 
             MavenExecutionRequest request = getMavenExecutionRequest( commonCliRequest, container );
 
